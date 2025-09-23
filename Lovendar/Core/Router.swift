@@ -4,15 +4,15 @@ import Combine
 // MARK: - Tab Selection
 enum TabSelection: CaseIterable, Hashable {
     case calendar
-    case add
+    case oshi
     case settings
     
     var title: String {
         switch self {
         case .calendar:
             return "カレンダー"
-        case .add:
-            return "追加"
+        case .oshi:
+            return "推し"
         case .settings:
             return "設定"
         }
@@ -22,8 +22,8 @@ enum TabSelection: CaseIterable, Hashable {
         switch self {
         case .calendar:
             return "calendar"
-        case .add:
-            return "plus.circle"
+        case .oshi:
+            return "heart.fill"
         case .settings:
             return "gearshape"
         }

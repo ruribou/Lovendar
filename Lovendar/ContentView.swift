@@ -22,8 +22,8 @@ struct ContentView: View {
         switch tab {
         case .calendar:
             CalendarView()
-        case .add:
-            AddView()
+        case .oshi:
+            OshiListView()
         case .settings:
             SettingsView()
         }
