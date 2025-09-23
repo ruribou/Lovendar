@@ -29,10 +29,22 @@ struct Oshi: Identifiable, Codable {
 
 extension Color {
     init?(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        guard hex.count == 6 else { return nil }
+        // #記号があれば削除
+        var hexSanitized = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         
-        let scanner = Scanner(string: hex)
+        // 3桁のHEXカラーコードを6桁に変換（例：#F00 → #FF0000）
+        if hexSanitized.count == 3 {
+            var expandedHex = ""
+            for char in hexSanitized {
+                expandedHex.append(String(repeating: char, count: 2))
+            }
+            hexSanitized = expandedHex
+        }
+        
+        // 6桁のHEXカラーコードかどうか確認
+        guard hexSanitized.count == 6 else { return nil }
+        
+        let scanner = Scanner(string: hexSanitized)
         var hexNumber: UInt64 = 0
         
         if scanner.scanHexInt64(&hexNumber) {
@@ -45,6 +57,22 @@ extension Color {
         }
         
         return nil
+    }
+    
+    // HEXカラーコードを文字列として取得（#付き）
+    var hexString: String? {
+        guard let components = self.cgColor?.components, components.count >= 3 else {
+            return nil
+        }
+        
+        let r = Float(components[0])
+        let g = Float(components[1])
+        let b = Float(components[2])
+        
+        return String(format: "#%02lX%02lX%02lX",
+                      lroundf(r * 255),
+                      lroundf(g * 255),
+                      lroundf(b * 255))
     }
 }
 
