@@ -6,17 +6,42 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A337DB162E829B22009E6B77 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A337DB132E829B22009E6B77 /* Assets.xcassets */; };
+		A337DB192E829B22009E6B77 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB082E829B22009E6B77 /* CalendarView.swift */; };
+		A337DB1A2E829B22009E6B77 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB092E829B22009E6B77 /* CalendarViewModel.swift */; };
+		A337DB1C2E829B22009E6B77 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB0C2E829B22009E6B77 /* Router.swift */; };
+		A337DB1D2E829B22009E6B77 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB0E2E829B22009E6B77 /* SettingsView.swift */; };
+		A337DB1E2E829B22009E6B77 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB0F2E829B22009E6B77 /* SettingsViewModel.swift */; };
+		A337DB1F2E829B22009E6B77 /* EventModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB112E829B22009E6B77 /* EventModel.swift */; };
+		A337DB202E829B22009E6B77 /* LovendarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB142E829B22009E6B77 /* LovendarApp.swift */; };
+		A337DB422E82A10A009E6B77 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB412E82A10A009E6B77 /* ContentView.swift */; };
+		A337DB6D2E82C7B6009E6B77 /* OshiViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB6B2E82C7B6009E6B77 /* OshiViewModel.swift */; };
+		A337DB6E2E82C7B6009E6B77 /* AddOshiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB682E82C7B6009E6B77 /* AddOshiView.swift */; };
+		A337DB6F2E82C7B6009E6B77 /* OshiSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB6A2E82C7B6009E6B77 /* OshiSelectionView.swift */; };
+		A337DB702E82C7B6009E6B77 /* OshiListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB692E82C7B6009E6B77 /* OshiListView.swift */; };
+		A337DB722E82C7C9009E6B77 /* OshiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB712E82C7C9009E6B77 /* OshiModel.swift */; };
+		A337DB782E82CDFB009E6B77 /* CalendarViewMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB772E82CDFB009E6B77 /* CalendarViewMode.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		A337DA532E811B0C009E6B77 /* Lovendar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lovendar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A337DB082E829B22009E6B77 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
+		A337DB092E829B22009E6B77 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
+		A337DB0C2E829B22009E6B77 /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
+		A337DB0E2E829B22009E6B77 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A337DB0F2E829B22009E6B77 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		A337DB112E829B22009E6B77 /* EventModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventModel.swift; sourceTree = "<group>"; };
+		A337DB132E829B22009E6B77 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A337DB142E829B22009E6B77 /* LovendarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LovendarApp.swift; sourceTree = "<group>"; };
+		A337DB412E82A10A009E6B77 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A337DB682E82C7B6009E6B77 /* AddOshiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddOshiView.swift; sourceTree = "<group>"; };
+		A337DB692E82C7B6009E6B77 /* OshiListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OshiListView.swift; sourceTree = "<group>"; };
+		A337DB6A2E82C7B6009E6B77 /* OshiSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OshiSelectionView.swift; sourceTree = "<group>"; };
+		A337DB6B2E82C7B6009E6B77 /* OshiViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OshiViewModel.swift; sourceTree = "<group>"; };
+		A337DB712E82C7C9009E6B77 /* OshiModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OshiModel.swift; sourceTree = "<group>"; };
+		A337DB772E82CDFB009E6B77 /* CalendarViewMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewMode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		A337DA552E811B0C009E6B77 /* Lovendar */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Lovendar;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A337DA502E811B0C009E6B77 /* Frameworks */ = {
@@ -32,7 +57,7 @@
 		A337DA4A2E811B0B009E6B77 = {
 			isa = PBXGroup;
 			children = (
-				A337DA552E811B0C009E6B77 /* Lovendar */,
+				A337DB152E829B22009E6B77 /* Lovendar */,
 				A337DA542E811B0C009E6B77 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -43,6 +68,68 @@
 				A337DA532E811B0C009E6B77 /* Lovendar.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A337DB0A2E829B22009E6B77 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				A337DB772E82CDFB009E6B77 /* CalendarViewMode.swift */,
+				A337DB082E829B22009E6B77 /* CalendarView.swift */,
+				A337DB092E829B22009E6B77 /* CalendarViewModel.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
+		A337DB0D2E829B22009E6B77 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				A337DB0C2E829B22009E6B77 /* Router.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		A337DB102E829B22009E6B77 /* Setting */ = {
+			isa = PBXGroup;
+			children = (
+				A337DB0E2E829B22009E6B77 /* SettingsView.swift */,
+				A337DB0F2E829B22009E6B77 /* SettingsViewModel.swift */,
+			);
+			path = Setting;
+			sourceTree = "<group>";
+		};
+		A337DB122E829B22009E6B77 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				A337DB712E82C7C9009E6B77 /* OshiModel.swift */,
+				A337DB112E829B22009E6B77 /* EventModel.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		A337DB152E829B22009E6B77 /* Lovendar */ = {
+			isa = PBXGroup;
+			children = (
+				A337DB6C2E82C7B6009E6B77 /* Oshi */,
+				A337DB412E82A10A009E6B77 /* ContentView.swift */,
+				A337DB0A2E829B22009E6B77 /* Calendar */,
+				A337DB0D2E829B22009E6B77 /* Core */,
+				A337DB102E829B22009E6B77 /* Setting */,
+				A337DB122E829B22009E6B77 /* Shared */,
+				A337DB132E829B22009E6B77 /* Assets.xcassets */,
+				A337DB142E829B22009E6B77 /* LovendarApp.swift */,
+			);
+			path = Lovendar;
+			sourceTree = "<group>";
+		};
+		A337DB6C2E82C7B6009E6B77 /* Oshi */ = {
+			isa = PBXGroup;
+			children = (
+				A337DB682E82C7B6009E6B77 /* AddOshiView.swift */,
+				A337DB692E82C7B6009E6B77 /* OshiListView.swift */,
+				A337DB6A2E82C7B6009E6B77 /* OshiSelectionView.swift */,
+				A337DB6B2E82C7B6009E6B77 /* OshiViewModel.swift */,
+			);
+			path = Oshi;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -59,9 +146,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				A337DA552E811B0C009E6B77 /* Lovendar */,
 			);
 			name = Lovendar;
 			packageProductDependencies = (
@@ -109,6 +193,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A337DB162E829B22009E6B77 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +204,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A337DB192E829B22009E6B77 /* CalendarView.swift in Sources */,
+				A337DB6D2E82C7B6009E6B77 /* OshiViewModel.swift in Sources */,
+				A337DB6E2E82C7B6009E6B77 /* AddOshiView.swift in Sources */,
+				A337DB6F2E82C7B6009E6B77 /* OshiSelectionView.swift in Sources */,
+				A337DB702E82C7B6009E6B77 /* OshiListView.swift in Sources */,
+				A337DB1A2E829B22009E6B77 /* CalendarViewModel.swift in Sources */,
+				A337DB1C2E829B22009E6B77 /* Router.swift in Sources */,
+				A337DB1D2E829B22009E6B77 /* SettingsView.swift in Sources */,
+				A337DB782E82CDFB009E6B77 /* CalendarViewMode.swift in Sources */,
+				A337DB422E82A10A009E6B77 /* ContentView.swift in Sources */,
+				A337DB1E2E829B22009E6B77 /* SettingsViewModel.swift in Sources */,
+				A337DB1F2E829B22009E6B77 /* EventModel.swift in Sources */,
+				A337DB202E829B22009E6B77 /* LovendarApp.swift in Sources */,
+				A337DB722E82C7C9009E6B77 /* OshiModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
