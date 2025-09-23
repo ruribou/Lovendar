@@ -2,28 +2,91 @@ import SwiftUI
 
 struct CalendarView: View {
     @StateObject private var viewModel = CalendarViewModel()
+    @State private var viewMode: CalendarViewMode = .month
+    @State private var showCalendarPicker = false
     
     private let columns = Array(repeating: GridItem(.flexible()), count: 7)
     private let weekdays = ["日", "月", "火", "水", "木", "金", "土"]
+    private let hourHeight: CGFloat = 60
+    private let hours = Array(0...23)
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                // カレンダーヘッダー
-                calendarHeader
+            ZStack {
+                // メインコンテンツ
+                VStack(spacing: 0) {
+                    // カレンダーヘッダー
+                    calendarHeader
+                    
+                    // 表示モードによって内容を切り替え
+                    if viewMode == .month {
+                        // 月表示モード
+                        VStack(spacing: 0) {
+                            // 曜日ヘッダー
+                            weekdayHeader
+                            
+                            // カレンダーグリッド
+                            calendarGrid
+                            
+                            // 選択された日の予定リスト
+                            selectedDateEvents
+                        }
+                    } else {
+                        // タイムライン表示モード
+                        timelineView
+                    }
+                    
+                    Spacer()
+                }
                 
-                // 曜日ヘッダー
-                weekdayHeader
-                
-                // カレンダーグリッド
-                calendarGrid
-                
-                Divider()
-                
-                // 選択された日の予定リスト
-                selectedDateEvents
-                
-                Spacer()
+                // カレンダーピッカーオーバーレイ（最前面に表示）
+                if showCalendarPicker {
+                    VStack {
+                        Spacer()
+                            .frame(height: 100) // ヘッダー分のスペース
+                        
+                        VStack {
+                            HStack {
+                                Spacer()
+                                
+                                Button(action: {
+                                    withAnimation {
+                                        showCalendarPicker = false
+                                    }
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.title2)
+                                        .foregroundColor(.gray)
+                                }
+                                .padding(8)
+                            }
+                            
+                            DatePicker("日付選択", selection: $viewModel.selectedDate, displayedComponents: .date)
+                                .datePickerStyle(GraphicalDatePickerStyle())
+                                .frame(height: 300)
+                                .padding(.horizontal)
+                        }
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(.systemBackground))
+                                .shadow(color: Color.black.opacity(0.2), radius: 10)
+                        )
+                        .padding(.horizontal)
+                        
+                        Spacer()
+                    }
+                    .transition(.opacity)
+                    .zIndex(1) // 最前面に表示
+                    .background(
+                        Color.black.opacity(0.3)
+                            .edgesIgnoringSafeArea(.all)
+                            .onTapGesture {
+                                withAnimation {
+                                    showCalendarPicker = false
+                                }
+                            }
+                    )
+                }
             }
             .navigationTitle("カレンダー")
             .navigationBarTitleDisplayMode(.large)
@@ -31,26 +94,65 @@ struct CalendarView: View {
     }
     
     private var calendarHeader: some View {
-        HStack {
-            Button(action: previousMonth) {
-                Image(systemName: "chevron.left")
+        VStack {
+            HStack {
+                Button(action: previousMonth) {
+                    Image(systemName: "chevron.left")
+                        .font(.title2)
+                        .foregroundColor(.primary)
+                }
+                
+                Spacer()
+                
+                Text(viewModel.monthYearString(from: viewModel.currentMonth))
                     .font(.title2)
-                    .foregroundColor(.primary)
+                    .fontWeight(.semibold)
+                    .onTapGesture {
+                        withAnimation {
+                            showCalendarPicker.toggle()
+                        }
+                    }
+                
+                Spacer()
+                
+                Button(action: nextMonth) {
+                    Image(systemName: "chevron.right")
+                        .font(.title2)
+                        .foregroundColor(.primary)
+                }
             }
             
-            Spacer()
-            
-            Text(viewModel.monthYearString(from: viewModel.currentMonth))
-                .font(.title2)
-                .fontWeight(.semibold)
-            
-            Spacer()
-            
-            Button(action: nextMonth) {
-                Image(systemName: "chevron.right")
-                    .font(.title2)
-                    .foregroundColor(.primary)
+            HStack {
+                Spacer()
+                
+                // 表示モード切り替えアイコンボタン
+                HStack(spacing: 20) {
+                    ForEach(CalendarViewMode.allCases, id: \.self) { mode in
+                        Button(action: {
+                            withAnimation {
+                                viewMode = mode
+                                // カレンダーピッカーが表示されている場合は閉じる
+                                if showCalendarPicker {
+                                    showCalendarPicker = false
+                                }
+                            }
+                        }) {
+                            VStack(spacing: 4) {
+                                Image(systemName: mode.systemIcon)
+                                    .font(.system(size: 20))
+                                    .foregroundColor(viewMode == mode ? .accentColor : .gray)
+                                
+                                Circle()
+                                    .fill(viewMode == mode ? Color.accentColor : Color.clear)
+                                    .frame(width: 4, height: 4)
+                            }
+                        }
+                    }
+                }
+                
+                Spacer()
             }
+            .padding(.top, 8)
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
@@ -116,6 +218,32 @@ struct CalendarView: View {
                     .padding(.bottom)
                 }
             }
+        }
+    }
+    
+    // タイムライン表示モード
+    private var timelineView: some View {
+        ScrollView {
+            LazyVStack(spacing: 0) {
+                ForEach(hours, id: \.self) { hour in
+                    TimelineHourView(
+                        hour: hour,
+                        events: eventsForHour(hour),
+                        hourHeight: hourHeight
+                    )
+                }
+            }
+        }
+        .scrollIndicators(.hidden)
+    }
+    
+    private func eventsForHour(_ hour: Int) -> [Event] {
+        let calendar = Calendar.current
+        return viewModel.eventsForDate(viewModel.selectedDate).filter { event in
+            if event.isAllDay { return hour == 0 } // 終日イベントは0時に表示
+            
+            let eventHour = calendar.component(.hour, from: event.startTime)
+            return eventHour == hour
         }
     }
     
@@ -202,18 +330,27 @@ struct CalendarDayView: View {
 
 struct EventRowView: View {
     let event: Event
+    @StateObject private var oshiViewModel = OshiViewModel.shared
     
     var body: some View {
         HStack {
             Rectangle()
-                .fill(Color.accentColor)
+                .fill(eventColor)
                 .frame(width: 4)
                 .cornerRadius(2)
             
             VStack(alignment: .leading, spacing: 2) {
-                Text(event.title)
-                    .font(.headline)
-                    .lineLimit(1)
+                HStack {
+                    Image(systemName: event.eventType.systemIcon)
+                        .foregroundColor(eventColor)
+                        .font(.caption)
+                    
+                    Text(event.title)
+                        .font(.headline)
+                        .lineLimit(1)
+                    
+                    Spacer()
+                }
                 
                 if !event.description.isEmpty {
                     Text(event.description)
@@ -222,10 +359,30 @@ struct EventRowView: View {
                         .lineLimit(2)
                 }
                 
-                if !event.isAllDay {
-                    Text(timeFormatter.string(from: event.startTime) + " - " + timeFormatter.string(from: event.endTime))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                HStack {
+                    if !event.isAllDay {
+                        Text(timeFormatter.string(from: event.startTime) + " - " + timeFormatter.string(from: event.endTime))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    } else {
+                        Text("終日")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Spacer()
+                    
+                    if let oshiId = event.oshiId,
+                       let oshi = oshiViewModel.oshiList.first(where: { $0.id == oshiId }) {
+                        HStack(spacing: 4) {
+                            Circle()
+                                .fill(oshi.displayColor)
+                                .frame(width: 8, height: 8)
+                            Text(oshi.name)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
                 }
             }
             
@@ -236,10 +393,71 @@ struct EventRowView: View {
         .cornerRadius(8)
     }
     
+    private var eventColor: Color {
+        if let oshiId = event.oshiId,
+           let oshi = oshiViewModel.oshiList.first(where: { $0.id == oshiId }) {
+            return oshi.displayColor
+        }
+        return Color.accentColor
+    }
+    
     private var timeFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         return formatter
+    }
+}
+
+// タイムライン表示用のビュー
+struct TimelineHourView: View {
+    let hour: Int
+    let events: [Event]
+    let hourHeight: CGFloat
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 0) {
+            // 時刻表示
+            VStack {
+                Text(String(format: "%02d", hour))
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(.secondary)
+                Text("00")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            .frame(width: 50)
+            .padding(.top, 4)
+            
+            // 区切り線
+            Rectangle()
+                .fill(Color.gray.opacity(0.3))
+                .frame(width: 1)
+            
+            // イベント表示エリア
+            VStack(alignment: .leading, spacing: 4) {
+                if events.isEmpty {
+                    // 空の時間帯
+                    Rectangle()
+                        .fill(Color.clear)
+                        .frame(height: hourHeight)
+                } else {
+                    ForEach(events) { event in
+                        EventRowView(event: event)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.leading, 8)
+        }
+        .frame(height: hourHeight)
+        .overlay(
+            // 時刻の区切り線
+            Rectangle()
+                .fill(Color.gray.opacity(0.2))
+                .frame(height: 0.5),
+            alignment: .bottom
+        )
     }
 }
 
