@@ -1,10 +1,3 @@
-//
-//  SettingsViewModel.swift
-//  Lovendar
-//
-//  Created by AI Assistant on 2025/09/23.
-//
-
 import Foundation
 import SwiftUI
 import Combine

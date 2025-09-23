@@ -1,10 +1,3 @@
-//
-//  CalendarView.swift
-//  Lovendar
-//
-//  Created by AI Assistant on 2025/09/23.
-//
-
 import SwiftUI
 
 struct CalendarView: View {
