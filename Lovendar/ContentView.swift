@@ -8,14 +8,32 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var router = Router.shared
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView(selection: $router.selectedTab) {
+            ForEach(TabSelection.allCases, id: \.self) { (tab: TabSelection) in
+                getViewForTab(tab)
+                    .tabItem {
+                        Image(systemName: tab.systemIcon)
+                        Text(tab.title)
+                    }
+                    .tag(tab)
+            }
         }
-        .padding()
+        .accentColor(.primary)
+    }
+    
+    @ViewBuilder
+    private func getViewForTab(_ tab: TabSelection) -> some View {
+        switch tab {
+        case .calendar:
+            CalendarView()
+        case .add:
+            AddView()
+        case .settings:
+            SettingsView()
+        }
     }
 }
 
