@@ -21,11 +21,22 @@ enum TabSelection: CaseIterable, Hashable {
     var systemIcon: String {
         switch self {
         case .calendar:
-            return "calendar"
+            return "calendar.circle.fill"
         case .oshi:
-            return "heart.fill"
+            return "heart.circle.fill"
         case .settings:
-            return "gearshape"
+            return "gearshape.circle.fill"
+        }
+    }
+    
+    var unselectedIcon: String {
+        switch self {
+        case .calendar:
+            return "calendar.circle"
+        case .oshi:
+            return "heart.circle"
+        case .settings:
+            return "gearshape.circle"
         }
     }
 }

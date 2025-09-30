@@ -22,6 +22,7 @@
 		A337DB702E82C7B6009E6B77 /* OshiListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB692E82C7B6009E6B77 /* OshiListView.swift */; };
 		A337DB722E82C7C9009E6B77 /* OshiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB712E82C7C9009E6B77 /* OshiModel.swift */; };
 		A337DB782E82CDFB009E6B77 /* CalendarViewMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB772E82CDFB009E6B77 /* CalendarViewMode.swift */; };
+		A39EDC882E8C2BC4007A8039 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A39EDC872E8C2BC4007A8039 /* ThemeManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 		A337DB6B2E82C7B6009E6B77 /* OshiViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OshiViewModel.swift; sourceTree = "<group>"; };
 		A337DB712E82C7C9009E6B77 /* OshiModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OshiModel.swift; sourceTree = "<group>"; };
 		A337DB772E82CDFB009E6B77 /* CalendarViewMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewMode.swift; sourceTree = "<group>"; };
+		A39EDC872E8C2BC4007A8039 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +85,7 @@
 		A337DB0D2E829B22009E6B77 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				A39EDC872E8C2BC4007A8039 /* ThemeManager.swift */,
 				A337DB0C2E829B22009E6B77 /* Router.swift */,
 			);
 			path = Core;
@@ -206,6 +209,7 @@
 			files = (
 				A337DB192E829B22009E6B77 /* CalendarView.swift in Sources */,
 				A337DB6D2E82C7B6009E6B77 /* OshiViewModel.swift in Sources */,
+				A39EDC882E8C2BC4007A8039 /* ThemeManager.swift in Sources */,
 				A337DB6E2E82C7B6009E6B77 /* AddOshiView.swift in Sources */,
 				A337DB6F2E82C7B6009E6B77 /* OshiSelectionView.swift in Sources */,
 				A337DB702E82C7B6009E6B77 /* OshiListView.swift in Sources */,

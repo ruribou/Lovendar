@@ -2,19 +2,25 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var router = Router.shared
+    @StateObject private var themeManager = ThemeManager.shared
     
     var body: some View {
         TabView(selection: $router.selectedTab) {
             ForEach(TabSelection.allCases, id: \.self) { (tab: TabSelection) in
                 getViewForTab(tab)
                     .tabItem {
-                        Image(systemName: tab.systemIcon)
-                        Text(tab.title)
+                        Label {
+                            Text(tab.title)
+                        } icon: {
+                            Image(systemName: router.selectedTab == tab ? tab.systemIcon : tab.unselectedIcon)
+                                .renderingMode(.template)
+                        }
                     }
                     .tag(tab)
             }
         }
-        .accentColor(.primary)
+        .accentColor(themeManager.currentTheme.primaryColor)
+        .tint(themeManager.currentTheme.primaryColor)
     }
     
     @ViewBuilder
