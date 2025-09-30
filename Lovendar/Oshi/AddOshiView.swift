@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AddOshiView: View {
     @StateObject private var oshiViewModel = OshiViewModel.shared
+    @StateObject private var themeManager = ThemeManager.shared
     @Environment(\.dismiss) private var dismiss
     
     @State private var name = ""
@@ -24,12 +25,22 @@ struct AddOshiView: View {
     
     var body: some View {
         NavigationView {
+            ZStack {
+                // ポップな背景（テーマに応じて変化）
+                LinearGradient(
+                    gradient: Gradient(colors: themeManager.currentTheme.backgroundGradientColors),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+                
             Form {
                 basicInfoSection
                 colorSection
                 dateSection
                 actionSection
             }
+            .scrollContentBackground(.hidden)
             .navigationTitle("新しい推し")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -37,7 +48,9 @@ struct AddOshiView: View {
                     Button("キャンセル") {
                         dismiss()
                     }
+                    .foregroundColor(themeManager.currentTheme.primaryColor)
                 }
+            }
             }
         }
     }
@@ -125,16 +138,14 @@ struct AddOshiView: View {
             if !isCustomColor {
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 10) {
                     ForEach(predefinedColors, id: \.self) { color in
-                        Circle()
-                            .fill(Color(hex: color) ?? Color.gray)
-                            .frame(width: 40, height: 40)
-                            .overlay(
-                                Circle()
-                                    .stroke(selectedColor == color ? Color.primary : Color.clear, lineWidth: 3)
-                            )
-                            .onTapGesture {
+                        ColorCircleView(
+                            colorHex: color,
+                            isSelected: selectedColor == color
+                        ) {
+                            withAnimation {
                                 selectedColor = color
                             }
+                        }
                     }
                 }
                 .padding(.vertical, 8)
@@ -173,8 +184,7 @@ struct AddOshiView: View {
                                 validateAndUpdateColor()
                             }
                             .font(.body)
-                            .autocapitalization(.none)
-                            .disableAutocorrection(true)
+                            .autocorrectionDisabled(true)
                         Circle()
                             .fill(Color(hex: customColorCode) ?? Color.gray)
                             .frame(width: 30, height: 30)
@@ -211,13 +221,56 @@ struct AddOshiView: View {
             Button(action: saveOshi) {
                 HStack {
                     Spacer()
+                    Image(systemName: "heart.circle.fill")
+                        .font(.title3)
                     Text("推しを追加")
-                        .fontWeight(.semibold)
+                        .fontWeight(.bold)
                     Spacer()
                 }
+                .foregroundStyle(themeManager.currentTheme.gradient)
+                .padding(.vertical, 4)
             }
             .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         }
+    }
+}
+
+// カラー選択用の円形ビュー
+struct ColorCircleView: View {
+    let colorHex: String
+    let isSelected: Bool
+    let onTap: () -> Void
+    
+    private var displayColor: Color {
+        Color(hex: colorHex) ?? Color.gray
+    }
+    
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            displayColor,
+                            displayColor.opacity(0.7)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 40, height: 40)
+                .shadow(color: displayColor.opacity(0.3), radius: 3, x: 0, y: 2)
+            
+            if isSelected {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.white)
+                    .font(.title3)
+                    .transition(.scale.combined(with: .opacity))
+            }
+        }
+        .scaleEffect(isSelected ? 1.1 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isSelected)
+        .onTapGesture(perform: onTap)
     }
 }
 
