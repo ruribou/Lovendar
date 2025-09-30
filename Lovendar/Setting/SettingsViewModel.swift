@@ -39,6 +39,9 @@ class SettingsViewModel: ObservableObject {
     @Published var showingExportAlert = false
     @Published var showingDeleteAlert = false
     
+    // テーママネージャーへの参照
+    let themeManager = ThemeManager.shared
+    
     private let userDefaults = UserDefaults.standard
     private var cancellables = Set<AnyCancellable>()
     

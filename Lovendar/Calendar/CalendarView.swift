@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CalendarView: View {
     @StateObject private var viewModel = CalendarViewModel()
+    @StateObject private var themeManager = ThemeManager.shared
     @State private var viewMode: CalendarViewMode = .month
     @State private var showCalendarPicker = false
     
@@ -13,6 +14,13 @@ struct CalendarView: View {
     var body: some View {
         NavigationView {
             ZStack {
+                // ポップな背景グラデーション（テーマに応じて変化）
+                LinearGradient(
+                    gradient: Gradient(colors: themeManager.currentTheme.backgroundGradientColors),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
                 // メインコンテンツ
                 VStack(spacing: 0) {
                     // カレンダーヘッダー
@@ -97,18 +105,20 @@ struct CalendarView: View {
         VStack {
             HStack {
                 Button(action: previousMonth) {
-                    Image(systemName: "chevron.left")
-                        .font(.title2)
-                        .foregroundColor(.primary)
+                    Image(systemName: "chevron.left.circle.fill")
+                        .font(.title)
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                        .symbolRenderingMode(.hierarchical)
                 }
                 
                 Spacer()
                 
                 Text(viewModel.monthYearString(from: viewModel.currentMonth))
                     .font(.title2)
-                    .fontWeight(.semibold)
+                    .fontWeight(.bold)
+                    .foregroundStyle(themeManager.currentTheme.gradient)
                     .onTapGesture {
-                        withAnimation {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                             showCalendarPicker.toggle()
                         }
                     }
@@ -116,9 +126,10 @@ struct CalendarView: View {
                 Spacer()
                 
                 Button(action: nextMonth) {
-                    Image(systemName: "chevron.right")
-                        .font(.title2)
-                        .foregroundColor(.primary)
+                    Image(systemName: "chevron.right.circle.fill")
+                        .font(.title)
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                        .symbolRenderingMode(.hierarchical)
                 }
             }
             
@@ -139,12 +150,27 @@ struct CalendarView: View {
                         }) {
                             VStack(spacing: 4) {
                                 Image(systemName: mode.systemIcon)
-                                    .font(.system(size: 20))
-                                    .foregroundColor(viewMode == mode ? .accentColor : .gray)
+                                    .font(.system(size: 22))
+                                    .symbolRenderingMode(.hierarchical)
+                                    .foregroundStyle(
+                                        viewMode == mode ? 
+                                        themeManager.currentTheme.gradient :
+                                        LinearGradient(
+                                            colors: [.gray],
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                                    .scaleEffect(viewMode == mode ? 1.1 : 1.0)
+                                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: viewMode)
                                 
-                                Circle()
-                                    .fill(viewMode == mode ? Color.accentColor : Color.clear)
-                                    .frame(width: 4, height: 4)
+                                RoundedRectangle(cornerRadius: 2)
+                                    .fill(
+                                        viewMode == mode ? 
+                                        themeManager.currentTheme.gradient :
+                                        LinearGradient(colors: [.clear], startPoint: .leading, endPoint: .trailing)
+                                    )
+                                    .frame(width: 20, height: 3)
                             }
                         }
                     }
@@ -268,6 +294,7 @@ struct CalendarView: View {
 }
 
 struct CalendarDayView: View {
+    @StateObject private var themeManager = ThemeManager.shared
     let date: Date
     let isInCurrentMonth: Bool
     let isToday: Bool
@@ -290,12 +317,13 @@ struct CalendarDayView: View {
                 
                 if hasEvents {
                     Circle()
-                        .fill(Color.accentColor)
-                        .frame(width: 4, height: 4)
+                        .fill(themeManager.currentTheme.gradient)
+                        .frame(width: 5, height: 5)
+                        .shadow(color: themeManager.currentTheme.primaryColor.opacity(0.4), radius: 2)
                 } else {
                     Circle()
                         .fill(Color.clear)
-                        .frame(width: 4, height: 4)
+                        .frame(width: 5, height: 5)
                 }
             }
             .frame(width: 40, height: 40)
@@ -319,9 +347,9 @@ struct CalendarDayView: View {
     
     private var backgroundColor: Color {
         if isSelected {
-            return .accentColor
+            return themeManager.currentTheme.primaryColor
         } else if isToday {
-            return .accentColor.opacity(0.1)
+            return themeManager.currentTheme.primaryColor.opacity(0.15)
         } else {
             return .clear
         }
@@ -331,6 +359,7 @@ struct CalendarDayView: View {
 struct EventRowView: View {
     let event: Event
     @StateObject private var oshiViewModel = OshiViewModel.shared
+    @StateObject private var themeManager = ThemeManager.shared
     
     var body: some View {
         HStack {
@@ -389,8 +418,11 @@ struct EventRowView: View {
             Spacer()
         }
         .padding(12)
-        .background(Color(.systemGray6))
-        .cornerRadius(8)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.white)
+                .shadow(color: eventColor.opacity(0.2), radius: 4, x: 0, y: 2)
+        )
     }
     
     private var eventColor: Color {
