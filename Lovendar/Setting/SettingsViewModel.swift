@@ -39,9 +39,13 @@ class SettingsViewModel: ObservableObject {
     @Published var showingExportAlert = false
     @Published var showingDeleteAlert = false
     @Published var showingLogoutAlert = false
+    @Published var isRefreshingUserInfo = false
+    @Published var userInfoErrorMessage: String?
     
     // テーママネージャーへの参照
     let themeManager = ThemeManager.shared
+    private let authManager = AuthManager.shared
+    private let apiService = APIService.shared
     
     private let userDefaults = UserDefaults.standard
     private var cancellables = Set<AnyCancellable>()
@@ -101,5 +105,28 @@ class SettingsViewModel: ObservableObject {
     func deleteAllData() {
         // TODO: 実際のデータ削除処理
         print("すべてのデータを削除しています...")
+    }
+    
+    // ユーザー情報を更新
+    func refreshUserInfo() async {
+        guard authManager.isAuthenticated else { return }
+        
+        isRefreshingUserInfo = true
+        userInfoErrorMessage = nil
+        
+        do {
+            let userInfo = try await apiService.getUserInfo()
+            let updatedUser = User(id: authManager.currentUser?.id, name: userInfo.name, email: userInfo.email)
+            
+            // AuthManagerのユーザー情報を更新
+            authManager.login(token: authManager.getAuthToken() ?? "", user: updatedUser)
+            
+        } catch let error as NetworkError {
+            userInfoErrorMessage = error.localizedDescription
+        } catch {
+            userInfoErrorMessage = "ユーザー情報の更新に失敗しました"
+        }
+        
+        isRefreshingUserInfo = false
     }
 }

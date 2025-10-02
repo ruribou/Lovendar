@@ -238,29 +238,8 @@ class CalendarViewModel: ObservableObject {
         await loadEvents()
     }
     
-    // 詳細なエラーメッセージを生成
+    // 簡略化されたエラーメッセージを生成
     private func getDetailedErrorMessage(_ error: Error) -> String {
-        if let nsError = error as NSError? {
-            switch nsError.code {
-            case NSURLErrorCancelled:
-                return "リクエストがキャンセルされました。もう一度お試しください。"
-            case NSURLErrorTimedOut:
-                return "接続がタイムアウトしました。ネットワーク接続を確認してください。"
-            case NSURLErrorCannotConnectToHost:
-                return "サーバーに接続できません。APIサーバーが起動しているか確認してください。"
-            case NSURLErrorNotConnectedToInternet:
-                return "インターネット接続がありません。"
-            case NSURLErrorNetworkConnectionLost:
-                return "ネットワーク接続が失われました。"
-            default:
-                return "ネットワークエラーが発生しました: \(nsError.localizedDescription)"
-            }
-        }
-        
-        if let networkError = error as? NetworkError {
-            return networkError.localizedDescription
-        }
-        
-        return "予期しないエラーが発生しました: \(error.localizedDescription)"
+        return "データの読み込みに失敗しました"
     }
 }

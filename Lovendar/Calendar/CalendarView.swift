@@ -276,36 +276,13 @@ struct CalendarView: View {
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                     
-                    // API接続状況の表示
-                    HStack(spacing: 8) {
-                        Circle()
-                            .fill(apiConfig.isConnected ? Color.green : Color.red)
-                            .frame(width: 8, height: 8)
-                        Text("API: \(apiConfig.currentEnvironment.displayName)")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                        Text(apiConfig.isConnected ? "接続中" : "未接続")
-                            .font(.caption2)
-                            .foregroundColor(apiConfig.isConnected ? .green : .red)
-                    }
-                    
-                    HStack(spacing: 16) {
-                        Button("接続テスト") {
-                            Task {
-                                await apiConfig.testConnection()
-                            }
+                    Button("再試行") {
+                        Task {
+                            await refreshData()
                         }
-                        .font(.caption)
-                        .foregroundColor(.blue)
-                        
-                        Button("再試行") {
-                            Task {
-                                await refreshData()
-                            }
-                        }
-                        .font(.caption)
-                        .foregroundColor(themeManager.currentTheme.primaryColor)
                     }
+                    .font(.caption)
+                    .foregroundColor(themeManager.currentTheme.primaryColor)
                 }
                 .padding(.horizontal)
                 .padding(.bottom)
@@ -376,36 +353,13 @@ struct CalendarView: View {
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                     
-                    // API接続状況の表示
-                    HStack(spacing: 8) {
-                        Circle()
-                            .fill(apiConfig.isConnected ? Color.green : Color.red)
-                            .frame(width: 8, height: 8)
-                        Text("API: \(apiConfig.currentEnvironment.displayName)")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                        Text(apiConfig.isConnected ? "接続中" : "未接続")
-                            .font(.caption2)
-                            .foregroundColor(apiConfig.isConnected ? .green : .red)
-                    }
-                    
-                    HStack(spacing: 16) {
-                        Button("接続テスト") {
-                            Task {
-                                await apiConfig.testConnection()
-                            }
+                    Button("再試行") {
+                        Task {
+                            await refreshData()
                         }
-                        .font(.caption)
-                        .foregroundColor(.blue)
-                        
-                        Button("再試行") {
-                            Task {
-                                await refreshData()
-                            }
-                        }
-                        .font(.caption)
-                        .foregroundColor(themeManager.currentTheme.primaryColor)
                     }
+                    .font(.caption)
+                    .foregroundColor(themeManager.currentTheme.primaryColor)
                 }
                 .padding(.horizontal)
                 .padding(.bottom)

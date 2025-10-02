@@ -28,8 +28,7 @@ class AuthViewModel: ObservableObject {
             if isLoginMode {
                 // ログイン
                 let response = try await authService.login(email: email, password: password)
-                let user = User(id: nil, name: "", email: email)
-                await authManager.login(token: response.token, user: user)
+                try await authManager.login(token: response.token)
             } else {
                 // 新規登録
                 guard isPasswordValid else {
@@ -39,8 +38,7 @@ class AuthViewModel: ObservableObject {
                 }
                 
                 let response = try await authService.register(name: name, email: email, password: password)
-                let user = User(id: nil, name: response.name, email: response.email)
-                await authManager.login(token: response.token, user: user)
+                try await authManager.login(token: response.token)
             }
         } catch let error as NetworkError {
             errorMessage = error.localizedDescription
