@@ -9,7 +9,7 @@ enum APIEnvironment: String, CaseIterable {
     var baseURL: String {
         switch self {
         case .local:
-            return Secrets.localBaseURL
+            return "http://localhost:8080/api"
         case .production:
             return Secrets.productionBaseURL
         }
