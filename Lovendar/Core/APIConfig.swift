@@ -9,9 +9,9 @@ enum APIEnvironment: String, CaseIterable {
     var baseURL: String {
         switch self {
         case .local:
-            return "http://localhost:8080/api"
+            return Secrets.localBaseURL
         case .production:
-            return "https://lovender-backend-969255446449.us-central1.run.app/api"
+            return Secrets.productionBaseURL
         }
     }
     

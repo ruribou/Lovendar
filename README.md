@@ -19,6 +19,39 @@
 
 [【Swift】VSCodeやCursorで快適なSwift開発ライフを送りたい](https://zenn.dev/ncdc/articles/swift_sweetpad)
 
+## 環境構築
+
+### 1. リポジトリのクローン
+
+```bash
+git clone <repository-url>
+cd Lovendar
+```
+
+### 2. Secrets の設定
+
+アプリケーションを実行する前に、API エンドポイントの設定が必要です。
+
+1. `Lovendar/Core/Secrets.swift.template` をコピーして `Secrets.swift` を作成
+
+```bash
+cp Lovendar/Core/Secrets.swift.template Lovendar/Core/Secrets.swift
+```
+
+2. `Lovendar/Core/Secrets.swift` を開き、実際の API URL を設定
+
+```swift
+struct Secrets {
+    static let productionBaseURL = "https://your-actual-production-url.com/api"
+    static let localBaseURL = "http://localhost:8080/api"
+}
+```
+
+### 3. ビルド
+
+XCode を開き、`Lovendar.xcodeproj` を開き、`Lovendar` を選択してビルドしてください。
+
 ## APIについて
 
 このアプリケーションは、バックエンドを使用しないと正常に動作しないので、あらかじめバックエンドの環境構築を終わらせておいてください。
+バックエンドリポジトリ：[lovender_backend](https://github.com/HijiriSato88/lovender_backend)
