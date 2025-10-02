@@ -14,6 +14,36 @@ struct CalendarView: View {
     private let hourHeight: CGFloat = 60
     private let hours = Array(0...23)
     
+    // 年月テキストの色を計算するプロパティ
+    private var monthYearTextColor: LinearGradient {
+        switch themeManager.currentTheme {
+        case .skyBlue:
+            // 青色テーマの場合、より濃い青色を使用してコントラストを高める
+            return LinearGradient(
+                colors: [Color(red: 0.1, green: 0.2, blue: 0.6), Color(red: 0.0, green: 0.3, blue: 0.7)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .green:
+            // 緑色テーマの場合、より濃い緑色を使用してコントラストを高める
+            return LinearGradient(
+                colors: [Color(red: 0.1, green: 0.5, blue: 0.2), Color(red: 0.0, green: 0.4, blue: 0.1)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .yellow:
+            // 黄色テーマの場合、濃いオレンジ色を使用してコントラストを高める
+            return LinearGradient(
+                colors: [Color(red: 0.9, green: 0.5, blue: 0.0), Color(red: 0.8, green: 0.4, blue: 0.0)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .pink:
+            // ピンクテーマの場合は従来のグラデーションを使用
+            return themeManager.currentTheme.gradient
+        }
+    }
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -140,7 +170,7 @@ struct CalendarView: View {
                 Text(viewModel.monthYearString(from: viewModel.currentMonth))
                     .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundStyle(themeManager.currentTheme.gradient)
+                    .foregroundStyle(monthYearTextColor)
                     .onTapGesture {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                             showCalendarPicker.toggle()
