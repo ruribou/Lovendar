@@ -138,5 +138,8 @@ Temporary Items
 .env.test.local
 .env.production.local
 
+# Secrets
+Lovendar/Core/Secrets.swift
+
 # Cursor
 .cursor/

@@ -11,7 +11,7 @@ enum APIEnvironment: String, CaseIterable {
         case .local:
             return "http://localhost:8080/api"
         case .production:
-            return "https://lovender-backend-969255446449.us-central1.run.app/api"
+            return Secrets.productionBaseURL
         }
     }
     

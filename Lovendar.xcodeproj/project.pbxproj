@@ -22,6 +22,7 @@
 		A337DB702E82C7B6009E6B77 /* OshiListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB692E82C7B6009E6B77 /* OshiListView.swift */; };
 		A337DB722E82C7C9009E6B77 /* OshiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB712E82C7C9009E6B77 /* OshiModel.swift */; };
 		A337DB782E82CDFB009E6B77 /* CalendarViewMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB772E82CDFB009E6B77 /* CalendarViewMode.swift */; };
+		A347526E2E8EC18300632FF0 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A347526D2E8EC18300632FF0 /* Secrets.swift */; };
 		A39EDC882E8C2BC4007A8039 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A39EDC872E8C2BC4007A8039 /* ThemeManager.swift */; };
 		A3F2CD6D2E8E3EC700878EE5 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F2CD6B2E8E3EC700878EE5 /* NetworkError.swift */; };
 		A3F2CD6E2E8E3EC700878EE5 /* EventService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F2CD6A2E8E3EC700878EE5 /* EventService.swift */; };
@@ -55,6 +56,7 @@
 		A337DB6B2E82C7B6009E6B77 /* OshiViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OshiViewModel.swift; sourceTree = "<group>"; };
 		A337DB712E82C7C9009E6B77 /* OshiModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OshiModel.swift; sourceTree = "<group>"; };
 		A337DB772E82CDFB009E6B77 /* CalendarViewMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewMode.swift; sourceTree = "<group>"; };
+		A347526D2E8EC18300632FF0 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
 		A39EDC872E8C2BC4007A8039 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		A3F2CD652E8E3EC700878EE5 /* APIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
 		A3F2CD662E8E3EC700878EE5 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
@@ -111,6 +113,7 @@
 		A337DB0D2E829B22009E6B77 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				A347526D2E8EC18300632FF0 /* Secrets.swift */,
 				A3F2CD822E8E4C5500878EE5 /* NetworkError.swift */,
 				A3F2CD652E8E3EC700878EE5 /* APIConfig.swift */,
 				A3F2CD662E8E3EC700878EE5 /* APIService.swift */,
@@ -275,6 +278,7 @@
 				A3F2CD762E8E3EFD00878EE5 /* APIModels.swift in Sources */,
 				A337DB1A2E829B22009E6B77 /* CalendarViewModel.swift in Sources */,
 				A337DB1C2E829B22009E6B77 /* Router.swift in Sources */,
+				A347526E2E8EC18300632FF0 /* Secrets.swift in Sources */,
 				A337DB1D2E829B22009E6B77 /* SettingsView.swift in Sources */,
 				A337DB782E82CDFB009E6B77 /* CalendarViewMode.swift in Sources */,
 				A337DB422E82A10A009E6B77 /* ContentView.swift in Sources */,

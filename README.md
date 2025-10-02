@@ -1,7 +1,6 @@
 ## Lovendar
 
 このアプリケーションは Hack U in 東京電機大学 2025 にて作成されたアプリケーションです。
-バックエンドリポジトリは[こちら](https://github.com/HijiriSato88/lovender_backend)になります。
 必ず Xcode をインストールして動作確認をするようにしてください。また MacOS を 26.0.1 へ更新していない場合は、必ず更新してください。
 
 以下の動作環境でビルドすることを推奨しています。
@@ -19,6 +18,40 @@
 
 [【Swift】VSCodeやCursorで快適なSwift開発ライフを送りたい](https://zenn.dev/ncdc/articles/swift_sweetpad)
 
+## 環境構築
+
+### 1. リポジトリのクローン
+
+```bash
+git clone git@github.com:ruribou/Lovendar.git
+cd Lovendar
+```
+
+### 2. Secrets の設定
+
+アプリケーションを実行する前に、API エンドポイントの設定が必要です。
+
+1. `Lovendar/Core/Secrets.swift.template` をコピーして `Secrets.swift` を作成
+
+```bash
+cp Lovendar/Core/Secrets.swift.template Lovendar/Core/Secrets.swift
+```
+
+2. `Lovendar/Core/Secrets.swift` を開き、実際の API URL を設定
+
+```swift
+struct Secrets {
+    static let productionBaseURL = "https://your-actual-production-url.com/api"
+}
+```
+
+### 3. ビルド
+
+XCode を開き、`Lovendar.xcodeproj` を開き、`Lovendar` を選択してビルドしてください。
+
 ## APIについて
 
 このアプリケーションは、バックエンドを使用しないと正常に動作しないので、あらかじめバックエンドの環境構築を終わらせておいてください。
+
+バックエンドリポジトリのURLはこちらです
+https://github.com/HijiriSato88/lovender_backend
