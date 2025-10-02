@@ -24,7 +24,7 @@
 ### 1. リポジトリのクローン
 
 ```bash
-git clone <repository-url>
+git clone git@github.com:ruribou/Lovendar.git
 cd Lovendar
 ```
 
