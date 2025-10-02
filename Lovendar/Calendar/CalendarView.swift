@@ -1,10 +1,13 @@
 import SwiftUI
+import Foundation
 
 struct CalendarView: View {
     @StateObject private var viewModel = CalendarViewModel()
     @StateObject private var themeManager = ThemeManager.shared
+    @StateObject private var apiConfig = APIConfig.shared
     @State private var viewMode: CalendarViewMode = .month
     @State private var showCalendarPicker = false
+    @State private var selectedEventForDetail: Event?
     
     private let columns = Array(repeating: GridItem(.flexible()), count: 7)
     private let weekdays = ["日", "月", "火", "水", "木", "金", "土"]
@@ -22,29 +25,34 @@ struct CalendarView: View {
                 )
                 .ignoresSafeArea()
                 // メインコンテンツ
-                VStack(spacing: 0) {
-                    // カレンダーヘッダー
-                    calendarHeader
-                    
-                    // 表示モードによって内容を切り替え
-                    if viewMode == .month {
-                        // 月表示モード
+                if viewMode == .month {
+                    // 月表示モード - 全体をScrollViewで囲む
+                    ScrollView {
                         VStack(spacing: 0) {
+                            // カレンダーヘッダー
+                            calendarHeader
+                            
                             // 曜日ヘッダー
                             weekdayHeader
                             
                             // カレンダーグリッド
                             calendarGrid
                             
-                            // 選択された日の予定リスト
-                            selectedDateEvents
+                            // 選択された日の予定リスト（ScrollViewを削除してVStackに変更）
+                            selectedDateEventsForMonthView
                         }
-                    } else {
-                        // タイムライン表示モード
+                    }
+                    .refreshable {
+                        await refreshData()
+                    }
+                } else {
+                    // タイムライン表示モード（既存のスワイプ更新機能を維持）
+                    VStack(spacing: 0) {
+                        // カレンダーヘッダー
+                        calendarHeader
+                        
                         timelineView
                     }
-                    
-                    Spacer()
                 }
                 
                 // カレンダーピッカーオーバーレイ（最前面に表示）
@@ -99,6 +107,22 @@ struct CalendarView: View {
             .navigationTitle("カレンダー")
             .navigationBarTitleDisplayMode(.large)
         }
+        .sheet(item: $selectedEventForDetail) { event in
+            EventDetailView(event: event)
+        }
+        .onAppear {
+            Task {
+                await refreshData()
+            }
+        }
+    }
+    
+    // データ更新用の共通関数
+    private func refreshData() async {
+        // API接続テストを先に実行
+        await apiConfig.testConnection()
+        // その後イベントを読み込み
+        await viewModel.refresh()
     }
     
     private var calendarHeader: some View {
@@ -228,21 +252,183 @@ struct CalendarView: View {
             
             let events = viewModel.eventsForDate(viewModel.selectedDate)
             
-            if events.isEmpty {
+            // ローディング状態の表示
+            if viewModel.isLoading {
+                HStack {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    Text("イベントを読み込み中...")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
+            }
+            // エラーメッセージの表示
+            else if let errorMessage = viewModel.errorMessage {
+                VStack(spacing: 12) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .foregroundColor(.orange)
+                        .font(.title2)
+                    
+                    Text(errorMessage)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                    
+                    // API接続状況の表示
+                    HStack(spacing: 8) {
+                        Circle()
+                            .fill(apiConfig.isConnected ? Color.green : Color.red)
+                            .frame(width: 8, height: 8)
+                        Text("API: \(apiConfig.currentEnvironment.displayName)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        Text(apiConfig.isConnected ? "接続中" : "未接続")
+                            .font(.caption2)
+                            .foregroundColor(apiConfig.isConnected ? .green : .red)
+                    }
+                    
+                    HStack(spacing: 16) {
+                        Button("接続テスト") {
+                            Task {
+                                await apiConfig.testConnection()
+                            }
+                        }
+                        .font(.caption)
+                        .foregroundColor(.blue)
+                        
+                        Button("再試行") {
+                            Task {
+                                await refreshData()
+                            }
+                        }
+                        .font(.caption)
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
+            }
+            // イベントが空の場合
+            else if events.isEmpty {
                 Text("予定はありません")
                     .foregroundColor(.secondary)
                     .padding(.horizontal)
                     .padding(.bottom)
-            } else {
+            }
+            // イベント一覧表示
+            else {
                 ScrollView {
                     LazyVStack(spacing: 8) {
                         ForEach(events) { event in
                             EventRowView(event: event)
+                                .onTapGesture {
+                                    selectedEventForDetail = event
+                                }
                         }
                     }
                     .padding(.horizontal)
                     .padding(.bottom)
                 }
+                .refreshable {
+                    await viewModel.refresh()
+                }
+            }
+        }
+    }
+    
+    // 月表示モード用の選択された日のイベント表示（ScrollViewなし）
+    private var selectedDateEventsForMonthView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(dateFormatter.string(from: viewModel.selectedDate))
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+            }
+            .padding(.horizontal)
+            .padding(.top)
+            
+            let events = viewModel.eventsForDate(viewModel.selectedDate)
+            
+            // ローディング状態の表示
+            if viewModel.isLoading {
+                HStack {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    Text("イベントを読み込み中...")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
+            }
+            // エラーメッセージの表示
+            else if let errorMessage = viewModel.errorMessage {
+                VStack(spacing: 12) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .foregroundColor(.orange)
+                        .font(.title2)
+                    
+                    Text(errorMessage)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                    
+                    // API接続状況の表示
+                    HStack(spacing: 8) {
+                        Circle()
+                            .fill(apiConfig.isConnected ? Color.green : Color.red)
+                            .frame(width: 8, height: 8)
+                        Text("API: \(apiConfig.currentEnvironment.displayName)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        Text(apiConfig.isConnected ? "接続中" : "未接続")
+                            .font(.caption2)
+                            .foregroundColor(apiConfig.isConnected ? .green : .red)
+                    }
+                    
+                    HStack(spacing: 16) {
+                        Button("接続テスト") {
+                            Task {
+                                await apiConfig.testConnection()
+                            }
+                        }
+                        .font(.caption)
+                        .foregroundColor(.blue)
+                        
+                        Button("再試行") {
+                            Task {
+                                await refreshData()
+                            }
+                        }
+                        .font(.caption)
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
+            }
+            // イベントが空の場合
+            else if events.isEmpty {
+                Text("予定はありません")
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
+                    .padding(.bottom)
+            }
+            // イベント一覧表示（ScrollViewなし、LazyVStackのまま）
+            else {
+                LazyVStack(spacing: 8) {
+                    ForEach(events) { event in
+                        EventRowView(event: event)
+                            .onTapGesture {
+                                selectedEventForDetail = event
+                            }
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
             }
         }
     }
@@ -255,12 +441,18 @@ struct CalendarView: View {
                     TimelineHourView(
                         hour: hour,
                         events: eventsForHour(hour),
-                        hourHeight: hourHeight
+                        hourHeight: hourHeight,
+                        onEventTap: { event in
+                            selectedEventForDetail = event
+                        }
                     )
                 }
             }
         }
         .scrollIndicators(.hidden)
+        .refreshable {
+            await refreshData()
+        }
     }
     
     private func eventsForHour(_ hour: Int) -> [Event] {
@@ -408,7 +600,7 @@ struct EventRowView: View {
                     Spacer()
                     
                     if let oshiId = event.oshiId,
-                       let oshi = oshiViewModel.oshiList.first(where: { $0.id == oshiId }) {
+                       let oshi = oshiViewModel.oshiList.first(where: { $0.serverId == oshiId }) {
                         HStack(spacing: 4) {
                             Circle()
                                 .fill(oshi.displayColor)
@@ -433,7 +625,7 @@ struct EventRowView: View {
     
     private var eventColor: Color {
         if let oshiId = event.oshiId,
-           let oshi = oshiViewModel.oshiList.first(where: { $0.id == oshiId }) {
+           let oshi = oshiViewModel.oshiList.first(where: { $0.serverId == oshiId }) {
             return oshi.displayColor
         }
         return Color.accentColor
@@ -451,6 +643,7 @@ struct TimelineHourView: View {
     let hour: Int
     let events: [Event]
     let hourHeight: CGFloat
+    let onEventTap: (Event) -> Void
     
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
@@ -482,6 +675,9 @@ struct TimelineHourView: View {
                 } else {
                     ForEach(events) { event in
                         EventRowView(event: event)
+                            .onTapGesture {
+                                onEventTap(event)
+                            }
                     }
                 }
             }
@@ -497,6 +693,140 @@ struct TimelineHourView: View {
             alignment: .bottom
         )
     }
+}
+
+// イベント詳細表示View
+struct EventDetailView: View {
+    let event: Event
+    @StateObject private var oshiViewModel = OshiViewModel.shared
+    @StateObject private var themeManager = ThemeManager.shared
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    // イベントタイトル
+                    HStack {
+                        Image(systemName: event.eventType.systemIcon)
+                            .foregroundColor(eventColor)
+                            .font(.title2)
+                        
+                        Text(event.title)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        
+                        Spacer()
+                    }
+                    
+                    // 日時情報
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("日時", systemImage: "calendar")
+                            .font(.headline)
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                        
+                        HStack {
+                            Text(dateFormatter.string(from: event.startTime))
+                                .font(.body)
+                            
+                            if !event.isAllDay {
+                                Text("•")
+                                    .foregroundColor(.secondary)
+                                
+                                if let endTime = event.endTime {
+                                    Text(timeFormatter.string(from: event.startTime) + " - " + timeFormatter.string(from: endTime))
+                                        .font(.body)
+                                } else {
+                                    Text(timeFormatter.string(from: event.startTime))
+                                        .font(.body)
+                                }
+                            } else {
+                                Text("• 終日")
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+                    
+                    // 推し情報
+                    if let oshiId = event.oshiId,
+                       let oshi = oshiViewModel.oshiList.first(where: { $0.serverId == oshiId }) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("推し", systemImage: "heart.fill")
+                                .font(.headline)
+                                .foregroundColor(themeManager.currentTheme.primaryColor)
+                            
+                            HStack {
+                                Circle()
+                                    .fill(Color.init(hex: oshi.color) ?? .pink)
+                                    .frame(width: 20, height: 20)
+                                
+                                Text(oshi.name)
+                                    .font(.body)
+                                    .fontWeight(.medium)
+                                
+                                Spacer()
+                            }
+                        }
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
+                    }
+                    
+                    // 説明
+                    if !event.description.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("詳細", systemImage: "text.alignleft")
+                                .font(.headline)
+                                .foregroundColor(themeManager.currentTheme.primaryColor)
+                            
+                            Text(event.description)
+                                .font(.body)
+                        }
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
+                    }
+                    
+                    Spacer()
+                }
+                .padding()
+            }
+            .navigationTitle("イベント詳細")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("閉じる") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+    
+    private var eventColor: Color {
+        if let oshiId = event.oshiId,
+           let oshi = oshiViewModel.oshiList.first(where: { $0.serverId == oshiId }) {
+            return Color.init(hex: oshi.color) ?? themeManager.currentTheme.primaryColor
+        }
+        return themeManager.currentTheme.primaryColor
+    }
+    
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .full
+        formatter.locale = Locale(identifier: "ja_JP")
+        return formatter
+    }()
+    
+    private let timeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        formatter.locale = Locale(identifier: "ja_JP")
+        return formatter
+    }()
 }
 
 #Preview {

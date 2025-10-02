@@ -12,6 +12,7 @@ class CalendarViewModel: ObservableObject {
     
     private let eventService = EventService.shared
     private let authManager = AuthManager.shared
+    private var loadingTask: Task<Void, Never>?
     
     static let shared = CalendarViewModel()
     
@@ -23,50 +24,133 @@ class CalendarViewModel: ObservableObject {
     
     // イベントデータを読み込み
     func loadEvents() async {
-        guard authManager.isAuthenticated else {
-            // 認証されていない場合は空リストを表示
-            events = []
-            return
-        }
+        // 既存のタスクをキャンセル
+        loadingTask?.cancel()
         
-        isLoading = true
-        errorMessage = nil
-        
-        do {
-            let oshiWithEvents = try await eventService.fetchEventList()
-            var allEvents: [Event] = []
+        loadingTask = Task {
+            print("🔄 CalendarViewModel: loadEvents() 開始")
             
-            for oshiData in oshiWithEvents {
-                for apiEvent in oshiData.events {
-                    if let event = convertAPIEventToEvent(apiEvent, oshiId: oshiData.id, oshiName: oshiData.name) {
-                        allEvents.append(event)
+            guard !Task.isCancelled else {
+                print("⏹️ CalendarViewModel: タスクがキャンセルされました")
+                return
+            }
+            
+            guard authManager.isAuthenticated else {
+                // 認証されていない場合は空リストを表示
+                print("❌ CalendarViewModel: 認証されていません")
+                await MainActor.run {
+                    events = []
+                    isLoading = false
+                }
+                return
+            }
+            
+            print("✅ CalendarViewModel: 認証済み、API呼び出し開始")
+            await MainActor.run {
+                isLoading = true
+                errorMessage = nil
+            }
+            
+            do {
+                guard !Task.isCancelled else {
+                    print("⏹️ CalendarViewModel: API呼び出し前にキャンセルされました")
+                    return
+                }
+                
+                let oshiWithEvents = try await eventService.fetchEventList()
+                
+                guard !Task.isCancelled else {
+                    print("⏹️ CalendarViewModel: API応答後にキャンセルされました")
+                    return
+                }
+                
+                print("📊 CalendarViewModel: API応答受信 - \(oshiWithEvents.count)個の推しデータ")
+                
+                var allEvents: [Event] = []
+                
+                for oshiData in oshiWithEvents {
+                    guard !Task.isCancelled else {
+                        print("⏹️ CalendarViewModel: データ変換中にキャンセルされました")
+                        return
                     }
+                    
+                    print("👤 推し: \(oshiData.name) - \(oshiData.events.count)個のイベント")
+                    for apiEvent in oshiData.events {
+                        if let event = convertAPIEventToEvent(apiEvent, oshiId: oshiData.id, oshiName: oshiData.name) {
+                            allEvents.append(event)
+                            print("📅 イベント変換成功: \(event.title)")
+                        } else {
+                            print("❌ イベント変換失敗: \(apiEvent.title)")
+                        }
+                    }
+                }
+                
+                await MainActor.run {
+                    events = allEvents
+                    print("✅ CalendarViewModel: 合計\(allEvents.count)個のイベントを読み込み完了")
+                }
+            } catch let error as NetworkError {
+                print("❌ CalendarViewModel: NetworkError - \(error.localizedDescription)")
+                await MainActor.run {
+                    errorMessage = getDetailedErrorMessage(error)
+                    events = []
+                }
+            } catch {
+                print("❌ CalendarViewModel: 一般エラー - \(error)")
+                await MainActor.run {
+                    errorMessage = getDetailedErrorMessage(error)
+                    events = []
                 }
             }
             
-            events = allEvents
-        } catch let error as NetworkError {
-            errorMessage = error.localizedDescription
-            events = []
-        } catch {
-            errorMessage = "エラーが発生しました"
-            events = []
+            await MainActor.run {
+                isLoading = false
+            }
         }
         
-        isLoading = false
+        await loadingTask?.value
     }
     
     // APIイベントをローカルイベントに変換
     private func convertAPIEventToEvent(_ apiEvent: EventAPI, oshiId: Int, oshiName: String) -> Event? {
+        print("🔄 変換開始: \(apiEvent.title), starts_at: \(apiEvent.startsAt)")
+        
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         
         guard let startDate = formatter.date(from: apiEvent.startsAt) else {
-            return nil
+            print("❌ 日付変換失敗: \(apiEvent.startsAt)")
+            
+            // フォールバック: 別のフォーマットを試す
+            let fallbackFormatter = ISO8601DateFormatter()
+            fallbackFormatter.formatOptions = [.withInternetDateTime]
+            
+            guard let fallbackStartDate = fallbackFormatter.date(from: apiEvent.startsAt) else {
+                print("❌ フォールバック日付変換も失敗")
+                return nil
+            }
+            
+            print("✅ フォールバック日付変換成功")
+            let endDate = apiEvent.endsAt.flatMap { fallbackFormatter.date(from: $0) }
+            let isAllDay = endDate == nil
+            
+            return Event(
+                serverId: apiEvent.id,
+                title: apiEvent.title,
+                description: apiEvent.description ?? "",
+                date: fallbackStartDate,
+                startTime: fallbackStartDate,
+                endTime: endDate,
+                isAllDay: isAllDay,
+                oshiId: oshiId,
+                eventType: .general
+            )
         }
         
         let endDate = apiEvent.endsAt.flatMap { formatter.date(from: $0) }
         let isAllDay = endDate == nil
+        
+        print("✅ 日付変換成功: \(startDate)")
         
         return Event(
             serverId: apiEvent.id,
@@ -76,7 +160,7 @@ class CalendarViewModel: ObservableObject {
             startTime: startDate,
             endTime: endDate,
             isAllDay: isAllDay,
-            oshiId: nil,
+            oshiId: oshiId,
             eventType: .general
         )
     }
@@ -152,5 +236,31 @@ class CalendarViewModel: ObservableObject {
     // データをリフレッシュ
     func refresh() async {
         await loadEvents()
+    }
+    
+    // 詳細なエラーメッセージを生成
+    private func getDetailedErrorMessage(_ error: Error) -> String {
+        if let nsError = error as NSError? {
+            switch nsError.code {
+            case NSURLErrorCancelled:
+                return "リクエストがキャンセルされました。もう一度お試しください。"
+            case NSURLErrorTimedOut:
+                return "接続がタイムアウトしました。ネットワーク接続を確認してください。"
+            case NSURLErrorCannotConnectToHost:
+                return "サーバーに接続できません。APIサーバーが起動しているか確認してください。"
+            case NSURLErrorNotConnectedToInternet:
+                return "インターネット接続がありません。"
+            case NSURLErrorNetworkConnectionLost:
+                return "ネットワーク接続が失われました。"
+            default:
+                return "ネットワークエラーが発生しました: \(nsError.localizedDescription)"
+            }
+        }
+        
+        if let networkError = error as? NetworkError {
+            return networkError.localizedDescription
+        }
+        
+        return "予期しないエラーが発生しました: \(error.localizedDescription)"
     }
 }

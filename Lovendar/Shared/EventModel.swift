@@ -9,10 +9,10 @@ struct Event: Identifiable, Codable {
     var startTime: Date
     var endTime: Date?
     var isAllDay: Bool
-    var oshiId: UUID?
+    var oshiId: Int?
     var eventType: EventType
     
-    init(serverId: Int? = nil, title: String, description: String = "", date: Date, startTime: Date? = nil, endTime: Date? = nil, isAllDay: Bool = false, oshiId: UUID? = nil, eventType: EventType = .general) {
+    init(serverId: Int? = nil, title: String, description: String = "", date: Date, startTime: Date? = nil, endTime: Date? = nil, isAllDay: Bool = false, oshiId: Int? = nil, eventType: EventType = .general) {
         self.id = UUID()
         self.serverId = serverId
         self.title = title

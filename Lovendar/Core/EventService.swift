@@ -10,11 +10,40 @@ class EventService {
     
     // イベント一覧取得
     func fetchEventList() async throws -> [OshiWithEvents] {
+        print("🔄 EventService: /me/events API呼び出し開始")
+        
         let response: EventListResponse = try await apiService.request(
             endpoint: "/me/events",
             method: .get,
             requiresAuth: true
         )
+        
+        print("📊 EventService: API応答受信")
+        print("📊 推しの数: \(response.oshis.count)")
+        
+        for (index, oshi) in response.oshis.enumerated() {
+            print("👤 推し[\(index)]: ID=\(oshi.id), 名前=\(oshi.name), 色=\(oshi.color)")
+            print("📅 イベント数: \(oshi.events.count)")
+            
+            for (eventIndex, event) in oshi.events.enumerated() {
+                print("  📅 イベント[\(eventIndex)]: ID=\(event.id), タイトル=\(event.title)")
+                print("    📅 開始日時: \(event.startsAt)")
+                print("    📅 終了日時: \(event.endsAt ?? "なし")")
+                print("    📅 説明: \(event.description ?? "なし")")
+                print("    📅 URL: \(event.url ?? "なし")")
+                print("    📅 アラーム: \(event.hasAlarm)")
+                print("    📅 通知タイミング: \(event.notificationTiming)")
+                if let category = event.category {
+                    print("    📅 カテゴリ: \(category.name) (slug: \(category.slug))")
+                } else {
+                    print("    📅 カテゴリ: なし")
+                }
+                print("    ---")
+            }
+            print("  ===")
+        }
+        
+        print("✅ EventService: レスポンス解析完了")
         return response.oshis
     }
     
@@ -23,71 +52,6 @@ class EventService {
         let response: EventDetailResponse = try await apiService.request(
             endpoint: "/me/events/\(id)",
             method: .get,
-            requiresAuth: true
-        )
-        return response.event
-    }
-    
-    // イベント新規作成
-    func createEvent(
-        oshiId: Int,
-        title: String,
-        description: String?,
-        url: String?,
-        startsAt: String,
-        endsAt: String?,
-        hasAlarm: Bool,
-        notificationTiming: String,
-        categoryId: Int?
-    ) async throws -> EventDetailAPI {
-        let eventData = CreateEventData(
-            oshiId: oshiId,
-            title: title,
-            description: description,
-            url: url,
-            startsAt: startsAt,
-            endsAt: endsAt,
-            hasAlarm: hasAlarm,
-            notificationTiming: notificationTiming,
-            categoryId: categoryId
-        )
-        let request = CreateEventRequest(event: eventData)
-        let response: EventCreateResponse = try await apiService.request(
-            endpoint: "/me/events/new",
-            method: .post,
-            body: request,
-            requiresAuth: true
-        )
-        return response.event
-    }
-    
-    // イベント更新
-    func updateEvent(
-        id: Int,
-        title: String,
-        description: String?,
-        url: String?,
-        startsAt: String,
-        endsAt: String?,
-        hasAlarm: Bool,
-        notificationTiming: String,
-        categoryId: Int?
-    ) async throws -> EventAPI {
-        let eventData = UpdateEventData(
-            title: title,
-            description: description,
-            url: url,
-            startsAt: startsAt,
-            endsAt: endsAt,
-            hasAlarm: hasAlarm,
-            notificationTiming: notificationTiming,
-            categoryId: categoryId
-        )
-        let request = UpdateEventRequest(event: eventData)
-        let response: EventUpdateResponse = try await apiService.request(
-            endpoint: "/me/events/\(id)",
-            method: .put,
-            body: request,
             requiresAuth: true
         )
         return response.event
