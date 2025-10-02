@@ -1,5 +1,12 @@
 import Foundation
 
+// MARK: - ユーザー関連
+
+struct UserInfoResponse: Codable {
+    let name: String
+    let email: String
+}
+
 // MARK: - 共通情報
 
 struct CommonResponse: Codable {

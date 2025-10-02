@@ -10,6 +10,17 @@ class APIService {
     
     private init() {}
     
+    // MARK: - ユーザー情報関連
+    
+    // ユーザー情報取得
+    func getUserInfo() async throws -> UserInfoResponse {
+        return try await request<UserInfoResponse>(
+            endpoint: "/me",
+            method: .get,
+            requiresAuth: true
+        )
+    }
+    
     // 汎用リクエストメソッド
     func request<T: Decodable>(
         endpoint: String,

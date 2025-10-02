@@ -23,7 +23,33 @@ class AuthManager: ObservableObject {
         return authToken
     }
     
-    // ログイン処理
+    // ログイン処理（トークンのみでユーザー情報をAPIから取得）
+    func login(token: String) async throws {
+        self.authToken = token
+        
+        // トークンを保存
+        UserDefaults.standard.set(token, forKey: tokenKey)
+        
+        // APIからユーザー情報を取得
+        do {
+            let userInfo = try await APIService.shared.getUserInfo()
+            let user = User(id: nil, name: userInfo.name, email: userInfo.email)
+            
+            self.currentUser = user
+            self.isAuthenticated = true
+            
+            // ユーザー情報を保存
+            if let encoded = try? JSONEncoder().encode(user) {
+                UserDefaults.standard.set(encoded, forKey: userKey)
+            }
+        } catch {
+            // ユーザー情報取得に失敗した場合はログアウト
+            self.logout()
+            throw error
+        }
+    }
+    
+    // 既存のログイン処理（後方互換性のため残す）
     func login(token: String, user: User) {
         self.authToken = token
         self.currentUser = user
