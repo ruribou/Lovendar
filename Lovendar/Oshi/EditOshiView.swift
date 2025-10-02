@@ -1,30 +1,41 @@
 import SwiftUI
 
-struct AddOshiView: View {
+struct EditOshiView: View {
     @StateObject private var oshiViewModel = OshiViewModel.shared
     @StateObject private var themeManager = ThemeManager.shared
     @Environment(\.dismiss) private var dismiss
     
-    @State private var name = ""
-    @State private var group = ""
-    @State private var selectedColor = "#FF69B4"
-    @State private var customColorCode = "#FF69B4"
+    let oshi: Oshi
+    
+    @State private var name: String
+    @State private var group: String
+    @State private var selectedColor: String
+    @State private var customColorCode: String
     @State private var isCustomColor = false
     @State private var showColorCodeError = false
-    @State private var description = ""
-    @State private var birthday: Date = Date()
-    @State private var hasBirthday = false
-    @State private var debutDate: Date = Date()
-    @State private var hasDebutDate = false
-    @State private var urls: [String] = [""]
-    @State private var selectedCategories: Set<String> = []
+    @State private var description: String
+    @State private var urls: [String]
+    @State private var selectedCategories: Set<String>
     @State private var availableCategories: [Category] = []
+    @State private var isLoading = false
+    @State private var errorMessage: String?
     
     private let predefinedColors = [
         "#FF69B4", "#87CEEB", "#98FB98", "#FFB6C1",
         "#DDA0DD", "#F0E68C", "#FFA07A", "#20B2AA",
         "#FF6347", "#9370DB", "#32CD32", "#FF1493"
     ]
+    
+    init(oshi: Oshi) {
+        self.oshi = oshi
+        self._name = State(initialValue: oshi.name)
+        self._group = State(initialValue: oshi.group)
+        self._selectedColor = State(initialValue: oshi.color)
+        self._customColorCode = State(initialValue: oshi.color)
+        self._description = State(initialValue: oshi.description)
+        self._urls = State(initialValue: oshi.urls.isEmpty ? [""] : oshi.urls)
+        self._selectedCategories = State(initialValue: Set(oshi.categories))
+    }
     
     var body: some View {
         NavigationView {
@@ -37,25 +48,27 @@ struct AddOshiView: View {
                 )
                 .ignoresSafeArea()
                 
-            Form {
-                basicInfoSection
-                urlSection
-                categorySection
-                colorSection
-                dateSection
-                actionSection
-            }
-            .scrollContentBackground(.hidden)
-            .navigationTitle("新しい推し")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("キャンセル") {
-                        dismiss()
-                    }
-                    .foregroundColor(themeManager.currentTheme.primaryColor)
+                Form {
+                    basicInfoSection
+                    urlSection
+                    categorySection
+                    colorSection
+                    actionSection
                 }
-            }
+                .scrollContentBackground(.hidden)
+                .navigationTitle("推しを編集")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("キャンセル") {
+                            dismiss()
+                        }
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                    }
+                }
+                .onAppear {
+                    loadCategories()
+                }
             }
         }
     }
@@ -77,6 +90,11 @@ struct AddOshiView: View {
     }
     
     private func saveOshi() {
+        guard let oshiId = oshi.serverId else {
+            errorMessage = "推しIDが見つかりません"
+            return
+        }
+        
         // カスタムカラーの場合、最終検証
         if isCustomColor {
             validateAndUpdateColor()
@@ -88,24 +106,39 @@ struct AddOshiView: View {
         // 使用するカラーコード
         let finalColor = isCustomColor ? customColorCode : selectedColor
         
-            Task {
-                do {
-                    let validUrls = urls.compactMap { url in
-                        url.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : url.trimmingCharacters(in: .whitespacesAndNewlines)
-                    }
-                    
-                    try await oshiViewModel.addOshi(
-                        name: name.trimmingCharacters(in: .whitespacesAndNewlines),
-                        color: finalColor,
-                        urls: validUrls.isEmpty ? nil : validUrls,
-                        categories: selectedCategories.isEmpty ? nil : Array(selectedCategories)
-                    )
-                    dismiss()
-                } catch {
-                    // エラー処理（必要に応じて）
-                    print("推しの追加に失敗しました: \(error)")
+        Task {
+            do {
+                isLoading = true
+                errorMessage = nil
+                
+                let validUrls = urls.compactMap { url in
+                    url.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : url.trimmingCharacters(in: .whitespacesAndNewlines)
                 }
+                
+                try await oshiViewModel.updateOshi(
+                    id: oshiId,
+                    name: name.trimmingCharacters(in: .whitespacesAndNewlines),
+                    color: finalColor,
+                    urls: validUrls.isEmpty ? nil : validUrls,
+                    categories: selectedCategories.isEmpty ? nil : Array(selectedCategories)
+                )
+                dismiss()
+            } catch {
+                errorMessage = "推しの更新に失敗しました: \(error.localizedDescription)"
+                isLoading = false
             }
+        }
+    }
+    
+    private func loadCategories() {
+        Task {
+            do {
+                let commonService = CommonService.shared
+                availableCategories = try await commonService.fetchCommonInfo()
+            } catch {
+                print("カテゴリーの読み込みに失敗しました: \(error)")
+            }
+        }
     }
     
     private var basicInfoSection: some View {
@@ -184,9 +217,6 @@ struct AddOshiView: View {
                     }
                 }
             }
-        }
-        .onAppear {
-            loadCategories()
         }
     }
     
@@ -288,90 +318,36 @@ struct AddOshiView: View {
         }
     }
     
-    private var dateSection: some View {
-        Section("日付情報") {
-            Toggle("誕生日を設定", isOn: $hasBirthday)
-            if hasBirthday {
-                DatePicker("誕生日", selection: $birthday, displayedComponents: .date)
-            }
-            Toggle("デビュー日を設定", isOn: $hasDebutDate)
-            if hasDebutDate {
-                DatePicker("デビュー日", selection: $debutDate, displayedComponents: .date)
-            }
-        }
-    }
-    
     private var actionSection: some View {
         Section {
+            if let errorMessage = errorMessage {
+                Text(errorMessage)
+                    .font(.caption)
+                    .foregroundColor(.red)
+            }
+            
             Button(action: saveOshi) {
                 HStack {
                     Spacer()
-                    Image(systemName: "heart.circle.fill")
-                        .font(.title3)
-                    Text("推しを追加")
-                        .fontWeight(.bold)
+                    if isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    } else {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.title3)
+                        Text("更新")
+                            .fontWeight(.bold)
+                    }
                     Spacer()
                 }
                 .foregroundStyle(themeManager.currentTheme.gradient)
                 .padding(.vertical, 4)
             }
-            .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-        }
-    }
-}
-
-// カラー選択用の円形ビュー
-struct ColorCircleView: View {
-    let colorHex: String
-    let isSelected: Bool
-    let onTap: () -> Void
-    
-    private var displayColor: Color {
-        Color.init(hex: colorHex) ?? Color.gray
-    }
-    
-    var body: some View {
-        ZStack {
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            displayColor,
-                            displayColor.opacity(0.7)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 40, height: 40)
-                .shadow(color: displayColor.opacity(0.3), radius: 3, x: 0, y: 2)
-            
-            if isSelected {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.white)
-                    .font(.title3)
-                    .transition(.scale.combined(with: .opacity))
-            }
-        }
-        .scaleEffect(isSelected ? 1.1 : 1.0)
-        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isSelected)
-        .onTapGesture(perform: onTap)
-    }
-}
-
-extension AddOshiView {
-    private func loadCategories() {
-        Task {
-            do {
-                let commonService = CommonService.shared
-                availableCategories = try await commonService.fetchCommonInfo()
-            } catch {
-                print("カテゴリーの読み込みに失敗しました: \(error)")
-            }
+            .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isLoading)
         }
     }
 }
 
 #Preview {
-    AddOshiView()
+    EditOshiView(oshi: Oshi(name: "テスト推し", color: "#FF69B4"))
 }

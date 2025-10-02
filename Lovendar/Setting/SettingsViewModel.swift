@@ -38,6 +38,7 @@ class SettingsViewModel: ObservableObject {
     @Published var timeFormat: TimeFormat = .twentyFourHour
     @Published var showingExportAlert = false
     @Published var showingDeleteAlert = false
+    @Published var showingLogoutAlert = false
     
     // テーママネージャーへの参照
     let themeManager = ThemeManager.shared

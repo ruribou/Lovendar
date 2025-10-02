@@ -390,9 +390,15 @@ struct EventRowView: View {
                 
                 HStack {
                     if !event.isAllDay {
-                        Text(timeFormatter.string(from: event.startTime) + " - " + timeFormatter.string(from: event.endTime))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        if let endTime = event.endTime {
+                            Text(timeFormatter.string(from: event.startTime) + " - " + timeFormatter.string(from: endTime))
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text(timeFormatter.string(from: event.startTime))
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
                     } else {
                         Text("終日")
                             .font(.caption)

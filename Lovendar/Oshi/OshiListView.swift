@@ -4,6 +4,7 @@ struct OshiListView: View {
     @StateObject private var viewModel = OshiViewModel.shared
     @StateObject private var themeManager = ThemeManager.shared
     @State private var showingAddView = false
+    @State private var selectedOshiForEdit: Oshi?
     
     var body: some View {
         NavigationView {
@@ -20,12 +21,20 @@ struct OshiListView: View {
                 ForEach(viewModel.oshiList) { oshi in
                     OshiRowView(oshi: oshi)
                         .onTapGesture {
-                            viewModel.selectedOshi = oshi
+                            selectedOshiForEdit = oshi
                         }
                 }
                 .onDelete(perform: deleteOshi)
             }
             .scrollContentBackground(.hidden)
+            .refreshable {
+                await viewModel.refresh()
+            }
+            .overlay {
+                if viewModel.isLoading {
+                    ProgressView()
+                }
+            }
             .navigationTitle("推し一覧")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
@@ -44,6 +53,9 @@ struct OshiListView: View {
             }
             .sheet(isPresented: $showingAddView) {
                 AddOshiView()
+            }
+            .sheet(item: $selectedOshiForEdit) { oshi in
+                EditOshiView(oshi: oshi)
             }
             }
         }
