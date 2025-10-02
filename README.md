@@ -43,7 +43,6 @@ cp Lovendar/Core/Secrets.swift.template Lovendar/Core/Secrets.swift
 ```swift
 struct Secrets {
     static let productionBaseURL = "https://your-actual-production-url.com/api"
-    static let localBaseURL = "http://localhost:8080/api"
 }
 ```
 
