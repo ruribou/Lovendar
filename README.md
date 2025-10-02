@@ -1,7 +1,6 @@
 ## Lovendar
 
 このアプリケーションは Hack U in 東京電機大学 2025 にて作成されたアプリケーションです。
-バックエンドリポジトリは[こちら](https://github.com/HijiriSato88/lovender_backend)になります。
 必ず Xcode をインストールして動作確認をするようにしてください。また MacOS を 26.0.1 へ更新していない場合は、必ず更新してください。
 
 以下の動作環境でビルドすることを推奨しています。
@@ -53,4 +52,6 @@ XCode を開き、`Lovendar.xcodeproj` を開き、`Lovendar` を選択してビ
 ## APIについて
 
 このアプリケーションは、バックエンドを使用しないと正常に動作しないので、あらかじめバックエンドの環境構築を終わらせておいてください。
-バックエンドリポジトリ：[lovender_backend](https://github.com/HijiriSato88/lovender_backend)
+
+バックエンドリポジトリのURLはこちらです
+https://github.com/HijiriSato88/lovender_backend
