@@ -24,6 +24,20 @@ struct CalendarView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
+        case .green:
+            // 緑色テーマの場合、より濃い緑色を使用してコントラストを高める
+            return LinearGradient(
+                colors: [Color(red: 0.1, green: 0.5, blue: 0.2), Color(red: 0.0, green: 0.4, blue: 0.1)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .yellow:
+            // 黄色テーマの場合、濃いオレンジ色を使用してコントラストを高める
+            return LinearGradient(
+                colors: [Color(red: 0.9, green: 0.5, blue: 0.0), Color(red: 0.8, green: 0.4, blue: 0.0)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
         case .pink:
             // ピンクテーマの場合は従来のグラデーションを使用
             return themeManager.currentTheme.gradient
