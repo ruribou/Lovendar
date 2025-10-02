@@ -225,138 +225,11 @@ struct SettingsView: View {
                     }
                     .padding(.vertical, 8)
                 }
-                // データ管理セクション
-                Section("データ管理") {
-                    Button(action: {
-                        viewModel.showingExportAlert = true
-                    }) {
-                        HStack {
-                            Image(systemName: "square.and.arrow.up.circle.fill")
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [
-                                            Color(hex: "#87CEEB") ?? .blue,
-                                            Color(hex: "#00BFFF") ?? .blue
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .font(.title2)
-                                .frame(width: 32, height: 32)
-                            
-                            Text("データをエクスポート")
-                                .foregroundColor(.primary)
-                            
-                            Spacer()
-                        }
-                        .padding(.vertical, 4)
-                    }
-                    
-                    Button(action: {
-                        viewModel.showingDeleteAlert = true
-                    }) {
-                        HStack {
-                            Image(systemName: "trash.circle.fill")
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [
-                                            Color.red,
-                                            Color.red.opacity(0.8)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .font(.title2)
-                                .frame(width: 32, height: 32)
-                            
-                            Text("すべてのデータを削除")
-                                .foregroundColor(.red)
-                            
-                            Spacer()
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
-                
-                // その他セクション
-                Section("その他") {
-                    Link(destination: URL(string: "https://example.com/privacy")!) {
-                        HStack {
-                            Image(systemName: "hand.raised.fill")
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [
-                                            Color.gray,
-                                            Color.gray.opacity(0.7)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .font(.title2)
-                                .frame(width: 32, height: 32)
-                            
-                            Text("プライバシーポリシー")
-                            
-                            Spacer()
-                            
-                            Image(systemName: "arrow.up.right.square")
-                                .foregroundColor(.secondary)
-                                .font(.caption)
-                        }
-                        .padding(.vertical, 4)
-                    }
-                    
-                    Link(destination: URL(string: "https://example.com/terms")!) {
-                        HStack {
-                            Image(systemName: "doc.text.fill")
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [
-                                            Color.gray,
-                                            Color.gray.opacity(0.7)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .font(.title2)
-                                .frame(width: 32, height: 32)
-                            
-                            Text("利用規約")
-                            
-                            Spacer()
-                            
-                            Image(systemName: "arrow.up.right.square")
-                                .foregroundColor(.secondary)
-                                .font(.caption)
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
             }
             .scrollContentBackground(.hidden)
             .navigationTitle("設定")
             .navigationBarTitleDisplayMode(.large)
             }
-        }
-        .alert("データをエクスポート", isPresented: $viewModel.showingExportAlert) {
-            Button("キャンセル", role: .cancel) { }
-            Button("エクスポート") {
-                viewModel.exportData()
-            }
-        } message: {
-            Text("カレンダーデータをエクスポートしますか？")
-        }
-        .alert("データを削除", isPresented: $viewModel.showingDeleteAlert) {
-            Button("キャンセル", role: .cancel) { }
-            Button("削除", role: .destructive) {
-                viewModel.deleteAllData()
-            }
-        } message: {
-            Text("すべてのカレンダーデータが削除されます。この操作は取り消せません。")
         }
         .alert("ログアウト", isPresented: $viewModel.showingLogoutAlert) {
             Button("キャンセル", role: .cancel) { }
@@ -367,7 +240,6 @@ struct SettingsView: View {
             Text("ログアウトしますか？\nログイン画面に戻ります。")
         }
     }
-    
     private var lastCheckFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateStyle = .none
