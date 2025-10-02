@@ -3,23 +3,45 @@ import SwiftUI
 
 struct Oshi: Identifiable, Codable {
     let id: UUID
+    var serverId: Int? // APIのID
     var name: String
     var group: String
     var color: String
+    var urls: [String]
+    var categories: [String]
     var profileImage: String?
     var birthday: Date?
     var debutDate: Date?
     var description: String
     
-    init(name: String, group: String = "", color: String = "#FF69B4", profileImage: String? = nil, birthday: Date? = nil, debutDate: Date? = nil, description: String = "") {
+    // ローカル用の初期化
+    init(name: String, group: String = "", color: String = "#FF69B4", urls: [String] = [], categories: [String] = [], profileImage: String? = nil, birthday: Date? = nil, debutDate: Date? = nil, description: String = "") {
         self.id = UUID()
+        self.serverId = nil
         self.name = name
         self.group = group
         self.color = color
+        self.urls = urls
+        self.categories = categories
         self.profileImage = profileImage
         self.birthday = birthday
         self.debutDate = debutDate
         self.description = description
+    }
+    
+    // API用の初期化
+    init(id: Int, name: String, color: String, urls: [String], categories: [String]) {
+        self.id = UUID()
+        self.serverId = id
+        self.name = name
+        self.group = ""
+        self.color = color
+        self.urls = urls
+        self.categories = categories
+        self.profileImage = nil
+        self.birthday = nil
+        self.debutDate = nil
+        self.description = ""
     }
     
     var displayColor: Color {
@@ -74,12 +96,4 @@ extension Color {
                       lroundf(g * 255),
                       lroundf(b * 255))
     }
-}
-
-extension Oshi {
-    static let sampleOshi: [Oshi] = [
-        Oshi(name: "推し1", group: "アイドルグループA", color: "#FF69B4", description: "最高の推し"),
-        Oshi(name: "推し2", group: "VTuberグループB", color: "#87CEEB", description: "可愛い推し"),
-        Oshi(name: "推し3", group: "声優グループC", color: "#98FB98", description: "歌声が素敵")
-    ]
 }

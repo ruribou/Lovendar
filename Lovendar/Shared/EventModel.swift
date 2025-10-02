@@ -2,17 +2,19 @@ import Foundation
 
 struct Event: Identifiable, Codable {
     let id: UUID
+    var serverId: Int? // APIのID
     var title: String
     var description: String
     var date: Date
     var startTime: Date
-    var endTime: Date
+    var endTime: Date?
     var isAllDay: Bool
-    var oshiId: UUID?
+    var oshiId: Int?
     var eventType: EventType
     
-    init(title: String, description: String = "", date: Date, startTime: Date? = nil, endTime: Date? = nil, isAllDay: Bool = false, oshiId: UUID? = nil, eventType: EventType = .general) {
+    init(serverId: Int? = nil, title: String, description: String = "", date: Date, startTime: Date? = nil, endTime: Date? = nil, isAllDay: Bool = false, oshiId: Int? = nil, eventType: EventType = .general) {
         self.id = UUID()
+        self.serverId = serverId
         self.title = title
         self.description = description
         self.date = date
@@ -81,12 +83,4 @@ enum EventType: String, CaseIterable, Codable {
             return "heart"
         }
     }
-}
-
-extension Event {
-    static let sampleEvents: [Event] = [
-        Event(title: "推しのライブ", description: "ソロライブコンサート", date: Date(), startTime: Date(), endTime: Calendar.current.date(byAdding: .hour, value: 3, to: Date()) ?? Date(), eventType: .live),
-        Event(title: "推しの誕生日", description: "お祝いの日♪", date: Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date(), isAllDay: true, eventType: .birthday),
-        Event(title: "新曲リリース", description: "待望の新曲発売日", date: Calendar.current.date(byAdding: .day, value: 3, to: Date()) ?? Date(), eventType: .release)
-    ]
 }

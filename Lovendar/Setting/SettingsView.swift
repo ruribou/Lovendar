@@ -3,6 +3,8 @@ import SwiftUI
 struct SettingsView: View {
     @StateObject private var viewModel = SettingsViewModel()
     @StateObject private var themeManager = ThemeManager.shared
+    @StateObject private var apiConfig = APIConfig.shared
+    @StateObject private var authManager = AuthManager.shared
     
     var body: some View {
         NavigationView {
@@ -16,6 +18,94 @@ struct SettingsView: View {
                 .ignoresSafeArea()
                 
             List {
+                // ユーザー情報セクション
+                if authManager.isAuthenticated {
+                    Section("ユーザー情報") {
+                        HStack {
+                            Image(systemName: "person.circle.fill")
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [
+                                            Color(hex: "#FF69B4") ?? .pink,
+                                            Color(hex: "#FF1493") ?? .pink
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .font(.title2)
+                                .frame(width: 32, height: 32)
+                            
+                            VStack(alignment: .leading) {
+                                if let user = authManager.currentUser {
+                                    Text(user.name)
+                                        .font(.headline)
+                                    Text(user.email)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                } else {
+                                    Text("ユーザー情報")
+                                        .font(.headline)
+                                    Text("読み込み中...")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding(.vertical, 4)
+                        
+                        Button(action: {
+                            viewModel.showingLogoutAlert = true
+                        }) {
+                            HStack {
+                                Image(systemName: "rectangle.portrait.and.arrow.right")
+                                    .foregroundStyle(
+                                        LinearGradient(
+                                            colors: [
+                                                Color.red,
+                                                Color.red.opacity(0.8)
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .font(.title2)
+                                    .frame(width: 32, height: 32)
+                                
+                                Text("ログアウト")
+                                    .foregroundColor(.red)
+                                    .font(.headline)
+                                
+                                Spacer()
+                                
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.secondary)
+                                    .font(.caption)
+                            }
+                            .padding(.vertical, 4)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+                Section("APIエンドポイント") {
+                    Picker("API環境", selection: $apiConfig.currentEnvironment) {
+                        ForEach(APIEnvironment.allCases, id: \.self) { env in
+                            Text(env.displayName).tag(env)
+                        }
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    
+                    HStack {
+                        Text("現在のエンドポイント")
+                        Spacer()
+                        Text(apiConfig.baseURL)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+                }
                 // アプリ情報セクション
                 Section("アプリ情報") {
                     HStack {
@@ -135,76 +225,6 @@ struct SettingsView: View {
                     }
                     .padding(.vertical, 8)
                 }
-                
-                // 表示設定セクション
-                Section("表示設定") {
-                    HStack {
-                        Image(systemName: "calendar.circle.fill")
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [
-                                        Color(hex: "#FF69B4") ?? .pink,
-                                        Color(hex: "#FF1493") ?? .pink
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .font(.title2)
-                            .frame(width: 32, height: 32)
-                        
-                        VStack(alignment: .leading) {
-                            Text("週の始まり")
-                            Text(viewModel.weekStart.displayName)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        Spacer()
-                        
-                        Picker("週の始まり", selection: $viewModel.weekStart) {
-                            ForEach(WeekStart.allCases, id: \.self) { weekStart in
-                                Text(weekStart.displayName).tag(weekStart)
-                            }
-                        }
-                        .pickerStyle(MenuPickerStyle())
-                    }
-                    .padding(.vertical, 4)
-                    
-                    HStack {
-                        Image(systemName: "textformat.size")
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [
-                                        Color(hex: "#98FB98") ?? .green,
-                                        Color(hex: "#32CD32") ?? .green
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .font(.title2)
-                            .frame(width: 32, height: 32)
-                        
-                        VStack(alignment: .leading) {
-                            Text("時刻表示")
-                            Text(viewModel.timeFormat.displayName)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        Spacer()
-                        
-                        Picker("時刻表示", selection: $viewModel.timeFormat) {
-                            ForEach(TimeFormat.allCases, id: \.self) { format in
-                                Text(format.displayName).tag(format)
-                            }
-                        }
-                        .pickerStyle(MenuPickerStyle())
-                    }
-                    .padding(.vertical, 4)
-                }
-                
                 // データ管理セクション
                 Section("データ管理") {
                     Button(action: {
@@ -338,6 +358,22 @@ struct SettingsView: View {
         } message: {
             Text("すべてのカレンダーデータが削除されます。この操作は取り消せません。")
         }
+        .alert("ログアウト", isPresented: $viewModel.showingLogoutAlert) {
+            Button("キャンセル", role: .cancel) { }
+            Button("ログアウト", role: .destructive) {
+                authManager.logout()
+            }
+        } message: {
+            Text("ログアウトしますか？\nログイン画面に戻ります。")
+        }
+    }
+    
+    private var lastCheckFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .none
+        formatter.timeStyle = .short
+        formatter.locale = Locale(identifier: "ja_JP")
+        return formatter
     }
 }
 
