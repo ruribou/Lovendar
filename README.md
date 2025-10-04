@@ -49,11 +49,5 @@ struct Secrets {
 
 ### 3. ビルド
 
-XCode を開き、`Lovendar.xcodeproj` を開き、`Lovendar` を選択してビルドしてください。
+XCode を開き、`Lovendar.xcodeproj` を開き、`Lovendar` を選択してビルドしてください
 
-## APIについて
-
-このアプリケーションは、バックエンドを使用しないと正常に動作しないので、あらかじめバックエンドの環境構築を終わらせておいてください。
-
-バックエンドリポジトリのURLはこちらです
-https://github.com/HijiriSato88/lovender_backend
