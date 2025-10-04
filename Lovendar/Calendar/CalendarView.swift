@@ -650,25 +650,40 @@ struct TimelineHourView: View {
                 .frame(width: 1)
             
             // イベント表示エリア
-            VStack(alignment: .leading, spacing: 4) {
-                if events.isEmpty {
-                    // 空の時間帯
-                    Rectangle()
-                        .fill(Color.clear)
-                        .frame(height: hourHeight)
-                } else {
-                    ForEach(events) { event in
-                        EventRowView(event: event)
-                            .onTapGesture {
-                                onEventTap(event)
-                            }
+            if events.isEmpty {
+                // 空の時間帯
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(height: hourHeight)
+                    .frame(maxWidth: .infinity)
+            } else if events.count == 1 {
+                // イベントが1つの場合
+                EventRowView(event: events[0])
+                    .onTapGesture {
+                        onEventTap(events[0])
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 8)
+            } else {
+                // 複数のイベントがある場合は横に並べる
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(events) { event in
+                            CompactEventRowView(event: event)
+                                .frame(width: 200) // 固定幅を設定
+                                .onTapGesture {
+                                    onEventTap(event)
+                                }
+                        }
+                    }
+                    .padding(.leading, 8)
+                    .padding(.trailing, 8)
                 }
+                .frame(maxWidth: .infinity)
+                .frame(height: hourHeight)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.leading, 8)
         }
-        .frame(height: hourHeight)
+        .frame(minHeight: hourHeight)
         .overlay(
             // 時刻の区切り線
             Rectangle()
@@ -676,6 +691,84 @@ struct TimelineHourView: View {
                 .frame(height: 0.5),
             alignment: .bottom
         )
+    }
+}
+
+// タイムライン用のコンパクトなイベント表示View
+struct CompactEventRowView: View {
+    let event: Event
+    @StateObject private var oshiViewModel = OshiViewModel.shared
+    @StateObject private var themeManager = ThemeManager.shared
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 4) {
+                Image(systemName: event.eventType.systemIcon)
+                    .foregroundColor(eventColor)
+                    .font(.caption2)
+                
+                Text(event.title)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .lineLimit(1)
+            }
+            
+            if !event.isAllDay {
+                if let endTime = event.endTime {
+                    Text(timeFormatter.string(from: event.startTime) + " - " + timeFormatter.string(from: endTime))
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                } else {
+                    Text(timeFormatter.string(from: event.startTime))
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                }
+            } else {
+                Text("終日")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            if let oshiId = event.oshiId,
+               let oshi = oshiViewModel.oshiList.first(where: { $0.serverId == oshiId }) {
+                HStack(spacing: 2) {
+                    Circle()
+                        .fill(oshi.displayColor)
+                        .frame(width: 6, height: 6)
+                    Text(oshi.name)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                }
+            }
+        }
+        .padding(8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.white)
+                .shadow(color: eventColor.opacity(0.2), radius: 2, x: 0, y: 1)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(eventColor, lineWidth: 2)
+        )
+    }
+    
+    private var eventColor: Color {
+        if let oshiId = event.oshiId,
+           let oshi = oshiViewModel.oshiList.first(where: { $0.serverId == oshiId }) {
+            return oshi.displayColor
+        }
+        return Color.accentColor
+    }
+    
+    private var timeFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter
     }
 }
 
