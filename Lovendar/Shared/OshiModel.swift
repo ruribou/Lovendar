@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct Oshi: Identifiable, Codable {
+struct Oshi: Identifiable, Codable, Hashable {
     let id: UUID
     var serverId: Int? // APIのID
     var name: String
@@ -45,6 +45,6 @@ struct Oshi: Identifiable, Codable {
     }
     
     var displayColor: Color {
-        Color(hex: color) ?? Color.pink
+        Color.init(hex: color) ?? Color.pink
     }
 }

@@ -5,6 +5,7 @@ struct SettingsView: View {
     @StateObject private var themeManager = ThemeManager.shared
     @StateObject private var apiConfig = APIConfig.shared
     @StateObject private var authManager = AuthManager.shared
+    @StateObject private var notificationManager = NotificationManager.shared
     
     var body: some View {
         NavigationView {
@@ -154,10 +155,41 @@ struct SettingsView: View {
                             .frame(width: 32, height: 32)
                         
                         Toggle("通知を許可", isOn: $viewModel.notificationsEnabled)
+                            .disabled(notificationManager.authorizationStatus == .denied)
                     }
                     .padding(.vertical, 4)
                     
-                    if viewModel.notificationsEnabled {
+                    // 通知許可の状態表示
+                    if notificationManager.authorizationStatus == .denied {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.orange)
+                                Text("通知が無効になっています")
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                            }
+                            
+                            Button(action: {
+                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                                    UIApplication.shared.open(url)
+                                }
+                            }) {
+                                HStack {
+                                    Image(systemName: "gear")
+                                    Text("設定を開く")
+                                }
+                                .font(.caption)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 12)
+                                .background(Color.orange.opacity(0.2))
+                                .cornerRadius(8)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    
+                    if viewModel.notificationsEnabled && notificationManager.authorizationStatus == .authorized {
                         HStack {
                             Image(systemName: "clock.fill")
                                 .foregroundStyle(

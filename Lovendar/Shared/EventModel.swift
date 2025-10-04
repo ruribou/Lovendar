@@ -11,8 +11,10 @@ struct Event: Identifiable, Codable {
     var isAllDay: Bool
     var oshiId: Int?
     var eventType: EventType
+    var hasAlarm: Bool
+    var notificationTiming: String // "5", "10", "15", "30", "45", "60"
     
-    init(serverId: Int? = nil, title: String, description: String = "", date: Date, startTime: Date? = nil, endTime: Date? = nil, isAllDay: Bool = false, oshiId: Int? = nil, eventType: EventType = .general) {
+    init(serverId: Int? = nil, title: String, description: String = "", date: Date, startTime: Date? = nil, endTime: Date? = nil, isAllDay: Bool = false, oshiId: Int? = nil, eventType: EventType = .general, hasAlarm: Bool = false, notificationTiming: String = "15") {
         self.id = UUID()
         self.serverId = serverId
         self.title = title
@@ -21,6 +23,8 @@ struct Event: Identifiable, Codable {
         self.isAllDay = isAllDay
         self.oshiId = oshiId
         self.eventType = eventType
+        self.hasAlarm = hasAlarm
+        self.notificationTiming = notificationTiming
         
         if isAllDay {
             self.startTime = Calendar.current.startOfDay(for: date)
