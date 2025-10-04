@@ -90,15 +90,8 @@ struct SettingsView: View {
                     }
                 }
                 Section("APIエンドポイント") {
-                    Picker("API環境", selection: $apiConfig.currentEnvironment) {
-                        ForEach(APIEnvironment.allCases, id: \.self) { env in
-                            Text(env.displayName).tag(env)
-                        }
-                    }
-                    .pickerStyle(SegmentedPickerStyle())
-                    
                     HStack {
-                        Text("現在のエンドポイント")
+                        Text("エンドポイント")
                         Spacer()
                         Text(apiConfig.baseURL)
                             .font(.caption2)
