@@ -6,8 +6,10 @@
 - Swift 6.2
 - iOS 26.0
 
-## 概要
+### アプリのアイコン
+<img width="128" height="128" alt="Lovendar" src="https://github.com/user-attachments/assets/abcec99c-e4ff-4338-b05b-5f423e922747" />
 
+## 概要
 このアプリケーションは Hack U in 東京電機大学 2025 にて作成されたアプリケーションです。
 必ず Xcode をインストールして動作確認をするようにしてください。また MacOS を 26.0.1 へ更新していない場合は、必ず更新してください。
 
