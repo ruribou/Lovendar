@@ -181,37 +181,6 @@ struct SettingsView: View {
                         }
                         .padding(.vertical, 4)
                     }
-                    
-                    if viewModel.notificationsEnabled && notificationManager.authorizationStatus == .authorized {
-                        HStack {
-                            Image(systemName: "clock.fill")
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [
-                                            Color(hex: "#DDA0DD") ?? .purple,
-                                            Color(hex: "#9370DB") ?? .purple
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .font(.title2)
-                                .frame(width: 32, height: 32)
-                            
-                            VStack(alignment: .leading) {
-                                Text("リマインダー時間")
-                                Text("\(viewModel.reminderMinutes)分前")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            
-                            Spacer()
-                            
-                            Stepper("", value: $viewModel.reminderMinutes, in: 1...60, step: 5)
-                                .labelsHidden()
-                        }
-                        .padding(.vertical, 4)
-                    }
                 }
                 
                 // テーマ設定セクション

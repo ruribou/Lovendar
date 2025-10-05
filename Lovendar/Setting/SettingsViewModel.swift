@@ -33,7 +33,6 @@ enum TimeFormat: String, CaseIterable {
 @MainActor
 class SettingsViewModel: ObservableObject {
     @Published var notificationsEnabled: Bool = false
-    @Published var reminderMinutes: Int = 15
     @Published var weekStart: WeekStart = .sunday
     @Published var timeFormat: TimeFormat = .twentyFourHour
     @Published var showingExportAlert = false
@@ -59,8 +58,6 @@ class SettingsViewModel: ObservableObject {
     
     private func loadSettings() {
         notificationsEnabled = userDefaults.bool(forKey: "notificationsEnabled")
-        reminderMinutes = userDefaults.integer(forKey: "reminderMinutes")
-        if reminderMinutes == 0 { reminderMinutes = 15 }
         
         if let weekStartRaw = userDefaults.object(forKey: "weekStart") as? Int,
            let weekStartValue = WeekStart(rawValue: weekStartRaw) {
@@ -86,12 +83,6 @@ class SettingsViewModel: ObservableObject {
                         await self.requestNotificationPermission()
                     }
                 }
-            }
-            .store(in: &cancellables)
-        
-        $reminderMinutes
-            .sink { [weak self] value in
-                self?.userDefaults.set(value, forKey: "reminderMinutes")
             }
             .store(in: &cancellables)
         

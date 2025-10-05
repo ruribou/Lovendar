@@ -45,7 +45,8 @@ class NotificationManager: NSObject, ObservableObject {
             return
         }
         
-        guard let minutesBefore = Int(event.notificationTiming) else {
+        // 通知タイミングをパース（"15m", "1h", "1d", "1w"などの形式に対応）
+        guard let minutesBefore = parseNotificationTiming(event.notificationTiming) else {
             print("❌ 無効な通知タイミング: \(event.notificationTiming)")
             return
         }
@@ -119,6 +120,42 @@ class NotificationManager: NSObject, ObservableObject {
     // スケジュールされている通知一覧を取得
     func getPendingNotifications() async -> [UNNotificationRequest] {
         return await UNUserNotificationCenter.current().pendingNotificationRequests()
+    }
+    
+    // 通知タイミングをパースして分単位に変換
+    // 対応形式: "15"（数値のみ）, "15m"（分）, "1h"（時間）, "1d"（日）, "1w"（週）
+    private func parseNotificationTiming(_ timing: String) -> Int? {
+        let trimmed = timing.trimmingCharacters(in: .whitespaces)
+        
+        // 数値のみの場合（後方互換性）
+        if let minutes = Int(trimmed) {
+            return minutes
+        }
+        
+        // 最後の文字が単位かチェック
+        guard let lastChar = trimmed.last else {
+            return nil
+        }
+        
+        let numberPart = String(trimmed.dropLast())
+        guard let value = Int(numberPart) else {
+            return nil
+        }
+        
+        // 単位に応じて分単位に変換
+        switch lastChar {
+        case "m", "M": // 分
+            return value
+        case "h", "H": // 時間
+            return value * 60
+        case "d", "D": // 日
+            return value * 60 * 24
+        case "w", "W": // 週
+            return value * 60 * 24 * 7
+        default:
+            print("❌ 未対応の単位: \(lastChar)")
+            return nil
+        }
     }
     
     // 日時フォーマット用のヘルパーメソッド
