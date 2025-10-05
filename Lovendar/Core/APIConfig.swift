@@ -3,43 +3,22 @@ import Combine
 
 // API環境設定
 enum APIEnvironment: String, CaseIterable {
-    case local = "local"
     case production = "production"
     
     var baseURL: String {
-        switch self {
-        case .local:
-            return "http://localhost:8080/api"
-        case .production:
-            return Secrets.productionBaseURL
-        }
+        return Secrets.productionBaseURL
     }
     
     var displayName: String {
-        switch self {
-        case .local:
-            return "ローカル環境"
-        case .production:
-            return "本番環境"
-        }
+        return "本番環境"
     }
     
     var description: String {
-        switch self {
-        case .local:
-            return "開発・テスト用のローカルサーバー"
-        case .production:
-            return "本番運用中のクラウドサーバー"
-        }
+        return "本番運用中のクラウドサーバー"
     }
     
     var statusColor: String {
-        switch self {
-        case .local:
-            return "#FFA500" // オレンジ
-        case .production:
-            return "#32CD32" // グリーン
-        }
+        return "#32CD32" // グリーン
     }
 }
 
@@ -47,7 +26,7 @@ enum APIEnvironment: String, CaseIterable {
 class APIConfig: ObservableObject {
     static let shared = APIConfig()
     
-    @Published var currentEnvironment: APIEnvironment = .local
+    @Published var currentEnvironment: APIEnvironment = .production
     @Published var isConnected: Bool = false
     @Published var lastConnectionCheck: Date?
     
