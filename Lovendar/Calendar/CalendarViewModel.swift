@@ -88,6 +88,11 @@ class CalendarViewModel: ObservableObject {
                 await MainActor.run {
                     events = allEvents
                     print("✅ CalendarViewModel: 合計\(allEvents.count)個のイベントを読み込み完了")
+                    
+                    // 通知をスケジュール
+                    let notificationManager = NotificationManager.shared
+                    notificationManager.scheduleNotifications(for: allEvents)
+                    print("📱 通知スケジュール処理を実行")
                 }
             } catch let error as NetworkError {
                 print("❌ CalendarViewModel: NetworkError - \(error.localizedDescription)")
@@ -143,7 +148,9 @@ class CalendarViewModel: ObservableObject {
                 endTime: endDate,
                 isAllDay: isAllDay,
                 oshiId: oshiId,
-                eventType: .general
+                eventType: .general,
+                hasAlarm: apiEvent.hasAlarm,
+                notificationTiming: apiEvent.notificationTiming
             )
         }
         
@@ -161,7 +168,9 @@ class CalendarViewModel: ObservableObject {
             endTime: endDate,
             isAllDay: isAllDay,
             oshiId: oshiId,
-            eventType: .general
+            eventType: .general,
+            hasAlarm: apiEvent.hasAlarm,
+            notificationTiming: apiEvent.notificationTiming
         )
     }
     

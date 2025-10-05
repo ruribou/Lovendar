@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A311BA1E2E90EAC1008D4F98 /* AddEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A311BA1D2E90EAC1008D4F98 /* AddEventView.swift */; };
+		A311BA212E90EAEA008D4F98 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A311BA1F2E90EAEA008D4F98 /* OnboardingView.swift */; };
+		A311BA232E90EB02008D4F98 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A311BA222E90EB02008D4F98 /* NotificationManager.swift */; };
 		A337DB162E829B22009E6B77 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A337DB132E829B22009E6B77 /* Assets.xcassets */; };
 		A337DB192E829B22009E6B77 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB082E829B22009E6B77 /* CalendarView.swift */; };
 		A337DB1A2E829B22009E6B77 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A337DB092E829B22009E6B77 /* CalendarViewModel.swift */; };
@@ -40,6 +43,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A311BA1D2E90EAC1008D4F98 /* AddEventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEventView.swift; sourceTree = "<group>"; };
+		A311BA1F2E90EAEA008D4F98 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		A311BA222E90EB02008D4F98 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		A337DA532E811B0C009E6B77 /* Lovendar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lovendar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A337DB082E829B22009E6B77 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		A337DB092E829B22009E6B77 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
@@ -84,6 +90,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A311BA202E90EAEA008D4F98 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				A311BA1F2E90EAEA008D4F98 /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 		A337DA4A2E811B0B009E6B77 = {
 			isa = PBXGroup;
 			children = (
@@ -103,6 +117,7 @@
 		A337DB0A2E829B22009E6B77 /* Calendar */ = {
 			isa = PBXGroup;
 			children = (
+				A311BA1D2E90EAC1008D4F98 /* AddEventView.swift */,
 				A337DB772E82CDFB009E6B77 /* CalendarViewMode.swift */,
 				A337DB082E829B22009E6B77 /* CalendarView.swift */,
 				A337DB092E829B22009E6B77 /* CalendarViewModel.swift */,
@@ -113,6 +128,7 @@
 		A337DB0D2E829B22009E6B77 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				A311BA222E90EB02008D4F98 /* NotificationManager.swift */,
 				A347526D2E8EC18300632FF0 /* Secrets.swift */,
 				A3F2CD822E8E4C5500878EE5 /* NetworkError.swift */,
 				A3F2CD652E8E3EC700878EE5 /* APIConfig.swift */,
@@ -151,6 +167,7 @@
 		A337DB152E829B22009E6B77 /* Lovendar */ = {
 			isa = PBXGroup;
 			children = (
+				A311BA202E90EAEA008D4F98 /* Onboarding */,
 				A3F2CD792E8E3F4C00878EE5 /* Auth */,
 				A337DB6C2E82C7B6009E6B77 /* Oshi */,
 				A337DB412E82A10A009E6B77 /* ContentView.swift */,
@@ -277,11 +294,14 @@
 				A337DB702E82C7B6009E6B77 /* OshiListView.swift in Sources */,
 				A3F2CD762E8E3EFD00878EE5 /* APIModels.swift in Sources */,
 				A337DB1A2E829B22009E6B77 /* CalendarViewModel.swift in Sources */,
+				A311BA212E90EAEA008D4F98 /* OnboardingView.swift in Sources */,
 				A337DB1C2E829B22009E6B77 /* Router.swift in Sources */,
+				A311BA232E90EB02008D4F98 /* NotificationManager.swift in Sources */,
 				A347526E2E8EC18300632FF0 /* Secrets.swift in Sources */,
 				A337DB1D2E829B22009E6B77 /* SettingsView.swift in Sources */,
 				A337DB782E82CDFB009E6B77 /* CalendarViewMode.swift in Sources */,
 				A337DB422E82A10A009E6B77 /* ContentView.swift in Sources */,
+				A311BA1E2E90EAC1008D4F98 /* AddEventView.swift in Sources */,
 				A337DB1E2E829B22009E6B77 /* SettingsViewModel.swift in Sources */,
 				A337DB1F2E829B22009E6B77 /* EventModel.swift in Sources */,
 				A337DB202E829B22009E6B77 /* LovendarApp.swift in Sources */,

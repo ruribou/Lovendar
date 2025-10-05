@@ -33,7 +33,6 @@ enum TimeFormat: String, CaseIterable {
 @MainActor
 class SettingsViewModel: ObservableObject {
     @Published var notificationsEnabled: Bool = false
-    @Published var reminderMinutes: Int = 15
     @Published var weekStart: WeekStart = .sunday
     @Published var timeFormat: TimeFormat = .twentyFourHour
     @Published var showingExportAlert = false
@@ -46,6 +45,7 @@ class SettingsViewModel: ObservableObject {
     let themeManager = ThemeManager.shared
     private let authManager = AuthManager.shared
     private let apiService = APIService.shared
+    private let notificationManager = NotificationManager.shared
     
     private let userDefaults = UserDefaults.standard
     private var cancellables = Set<AnyCancellable>()
@@ -53,12 +53,11 @@ class SettingsViewModel: ObservableObject {
     init() {
         loadSettings()
         observeChanges()
+        syncNotificationStatus()
     }
     
     private func loadSettings() {
         notificationsEnabled = userDefaults.bool(forKey: "notificationsEnabled")
-        reminderMinutes = userDefaults.integer(forKey: "reminderMinutes")
-        if reminderMinutes == 0 { reminderMinutes = 15 }
         
         if let weekStartRaw = userDefaults.object(forKey: "weekStart") as? Int,
            let weekStartValue = WeekStart(rawValue: weekStartRaw) {
@@ -73,14 +72,17 @@ class SettingsViewModel: ObservableObject {
     
     private func observeChanges() {
         $notificationsEnabled
+            .dropFirst() // 初回ロード時はスキップ
             .sink { [weak self] value in
-                self?.userDefaults.set(value, forKey: "notificationsEnabled")
-            }
-            .store(in: &cancellables)
-        
-        $reminderMinutes
-            .sink { [weak self] value in
-                self?.userDefaults.set(value, forKey: "reminderMinutes")
+                guard let self = self else { return }
+                self.userDefaults.set(value, forKey: "notificationsEnabled")
+                
+                // 通知をONにした場合は権限をリクエスト
+                if value {
+                    Task {
+                        await self.requestNotificationPermission()
+                    }
+                }
             }
             .store(in: &cancellables)
         
@@ -95,6 +97,28 @@ class SettingsViewModel: ObservableObject {
                 self?.userDefaults.set(value.rawValue, forKey: "timeFormat")
             }
             .store(in: &cancellables)
+    }
+    
+    // 通知権限の状態を同期
+    private func syncNotificationStatus() {
+        notificationManager.$authorizationStatus
+            .sink { [weak self] status in
+                guard let self = self else { return }
+                // 権限が拒否された場合は設定をOFFに
+                if status == .denied {
+                    self.notificationsEnabled = false
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    // 通知権限をリクエスト
+    func requestNotificationPermission() async {
+        let granted = await notificationManager.requestAuthorization()
+        if !granted {
+            // 権限が拒否された場合は設定をOFFに戻す
+            notificationsEnabled = false
+        }
     }
     
     func exportData() {
